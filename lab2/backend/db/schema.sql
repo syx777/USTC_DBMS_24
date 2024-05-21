@@ -74,15 +74,20 @@ CREATE TABLE Files (
 
 
 CREATE PROCEDURE AddStudent(
+    IN student_id VARCHAR(20),
     IN name VARCHAR(100),
-    IN gender ENUM('Male', 'Female'),
-    IN birth_date DATE,
-    IN major VARCHAR(100),
-    IN photo BLOB
+    IN gender ENUM('M', 'F'),
+    #IN birth_date DATE,
+    IN major VARCHAR(100)
+    #IN photo BLOB
 )
 BEGIN
-    INSERT INTO Students (name, gender, birth_date, major, photo)
-    VALUES (name, gender, birth_date, major, photo);
+    INSERT INTO Students (student_id,name, gender, major)
+    VALUES (student_id,name, gender, major);
 END
 ;
+Call AddStudent('PB21111001','Tom', 'M', 'Computer Science');
+Call AddStudent('PB21111002','Jerry', 'F', 'Math');
+Call AddStudent('PB21111003','Alice', 'F',  'History');
+Call AddStudent('PB21111004','Bob', 'M', 'Computer Science');
 
