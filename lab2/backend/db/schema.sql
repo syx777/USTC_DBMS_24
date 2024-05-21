@@ -9,6 +9,7 @@ drop table if exists CourseGrades;
 drop table if exists Files;
 drop table if exists Courses;
 drop table if exists Students;
+drop procedure if exists AddStudent;
 
 
 -- 学生基本信息表
@@ -16,7 +17,7 @@ CREATE TABLE Students (
     student_id VARCHAR(20) PRIMARY KEY NOT NULL,
     name VARCHAR(100),
     gender ENUM('M', 'F') NOT NULL,
-    birth_date DATE NOT NULL,
+    #birth_date DATE NOT NULL,
     major VARCHAR(100),
     # photo BLOB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -25,7 +26,7 @@ CREATE TABLE Students (
 -- 专业变更表
 CREATE TABLE MajorChanges (
     change_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT,
+    student_id VARCHAR(20),
     old_major VARCHAR(100),
     new_major VARCHAR(100),
     change_date DATE,
@@ -35,7 +36,7 @@ CREATE TABLE MajorChanges (
 -- 奖惩情况表
 CREATE TABLE AwardsPunishments (
     record_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT,
+    student_id VARCHAR(20),
     type ENUM('Award', 'Punishment'),
     description TEXT,
     date DATE,
@@ -53,7 +54,7 @@ CREATE TABLE Courses (
 -- 课程成绩表
 CREATE TABLE CourseGrades (
     grade_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT,
+    student_id VARCHAR(20),
     course_id INT,
     grade DECIMAL(5,2),
     FOREIGN KEY (student_id) REFERENCES Students(student_id),
@@ -63,7 +64,7 @@ CREATE TABLE CourseGrades (
 -- 文件管理表
 CREATE TABLE Files (
     file_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT,
+    student_id VARCHAR(20),
     file_name VARCHAR(255),
     file_type VARCHAR(50),
     file_content LONGBLOB,
@@ -71,7 +72,6 @@ CREATE TABLE Files (
     FOREIGN KEY (student_id) REFERENCES Students(student_id)
 );
 
-DELIMITER //
 
 CREATE PROCEDURE AddStudent(
     IN name VARCHAR(100),
@@ -83,6 +83,6 @@ CREATE PROCEDURE AddStudent(
 BEGIN
     INSERT INTO Students (name, gender, birth_date, major, photo)
     VALUES (name, gender, birth_date, major, photo);
-END //
+END
+;
 
-DELIMITER ;

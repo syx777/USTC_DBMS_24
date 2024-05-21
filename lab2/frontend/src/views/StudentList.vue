@@ -2,6 +2,7 @@
   <div class="students">
     <h1>Students</h1>
     <form @submit.prevent="addStudent">
+      <input v-model="newStudent.student_id" placeholder="Student-id" required />
       <input v-model="newStudent.name" placeholder="Name" required />
       <input v-model="newStudent.gender" placeholder="Gender" required />
       <input v-model="newStudent.major" placeholder="Major" required />
@@ -17,6 +18,7 @@
     <div v-if="editingStudent">
       <h3>Edit Student</h3>
       <form @submit.prevent="updateStudent">
+        <input v-model="editingStudent.name" placeholder="Student-id" required />
         <input v-model="editingStudent.name" placeholder="Name" required />
         <input v-model="editingStudent.gender" placeholder="Gender" required />
         <input v-model="editingStudent.major" placeholder="Major" required />
@@ -36,6 +38,7 @@ export default {
     return {
       students: [],
       newStudent: {
+        student_id:'',
         name: '',
         gender: '',
         birth_date: '',

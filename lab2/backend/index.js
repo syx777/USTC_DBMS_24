@@ -46,8 +46,8 @@ app.get('/api/students', (req, res) => {
 app.post('/api/students', (req, res) => {
   const newStudent = req.body;
   console.log('Received new student:', newStudent); // 添加日志记录
-  const sql = 'INSERT INTO Students (name, gender, major) VALUES (?, ?, ?)';
-  db.query(sql, [newStudent.name, newStudent.gender,newStudent.major], (err, result) => {
+  const sql = 'INSERT INTO Students (student_id,name, gender, major) VALUES (?,?, ?, ?)';
+  db.query(sql, [newStudent.student_id,newStudent.name, newStudent.gender,newStudent.major], (err, result) => {
     if (err) {
       console.error('Error inserting student:', err); // 错误日志
       res.status(500).json({ error: err.message });
