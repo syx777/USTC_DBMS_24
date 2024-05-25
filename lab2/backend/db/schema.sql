@@ -4,7 +4,6 @@ USE SchoolManagementSystem;
 
 drop table if exists MajorChanges;
 drop table if exists AwardsPunishments;
-
 drop table if exists CourseGrades;
 drop table if exists Files;
 drop table if exists Courses;
@@ -23,6 +22,7 @@ CREATE TABLE Students (
 );
 
 SHOW VARIABLES LIKE 'secure_file_priv';
+SELECT LOAD_FILE('/var/lib/mysql-files/exp1.jpg');
 
 
 -- 专业变更表
@@ -88,8 +88,8 @@ BEGIN
     VALUES (student_id,name, gender, class,phone,photo);
 END
 ;
-Call AddStudent('PB21111001','Tom', 'M', 'CS001','19337353643',LOAD_FILE('/home/affogato/ustc_db/lab2/backend/db/exp1.jpg'));
-Call AddStudent('PB21111002','Jerry', 'F', 'Ma002','18934372238','exp2.jpg');
+Call AddStudent('PB21111001','Tom', 'M', 'CS001','19337353643',LOAD_FILE('/var/lib/mysql-files/exp1.jpg'));
+Call AddStudent('PB21111002','Jerry', 'F', 'Ma002','18934372238',LOAD_FILE('/var/lib/mysql-files/exp2.jpg'));
 Call AddStudent('PB21111003','Alice', 'F',  'CS003','18137649812',null);
 Call AddStudent('PB21111004','Bob', 'M', 'CS001','13782648987',null);
 

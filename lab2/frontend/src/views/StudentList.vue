@@ -10,7 +10,7 @@
     </form>
     <ul>
       <li v-for="student in students" :key="student.student_id">
-        {{ student.name }} - {{ student.photo }}
+        {{ student.name }} - <img :src="student.photo" alt="Student Photo" />
         <button @click="editStudent(student)">Edit</button>
         <button @click="deleteStudent(student.student_id)">Delete</button>
       </li>
