@@ -5,12 +5,12 @@
       <input v-model="newStudent.student_id" placeholder="Student-id" required />
       <input v-model="newStudent.name" placeholder="Name" required />
       <input v-model="newStudent.gender" placeholder="Gender" required />
-      <input v-model="newStudent.major" placeholder="Major" required />
+      <input v-model="newStudent.class" placeholder="Class" required />
       <button type="submit">Add Student</button>
     </form>
     <ul>
       <li v-for="student in students" :key="student.student_id">
-        {{ student.name }} - {{ student.major }}
+        {{ student.name }} - {{ student.photo }}
         <button @click="editStudent(student)">Edit</button>
         <button @click="deleteStudent(student.student_id)">Delete</button>
       </li>
@@ -18,10 +18,10 @@
     <div v-if="editingStudent">
       <h3>Edit Student</h3>
       <form @submit.prevent="updateStudent">
-        <input v-model="editingStudent.name" placeholder="Student-id" required />
+        <input v-model="editingStudent.student_id" placeholder="Student-id" required />
         <input v-model="editingStudent.name" placeholder="Name" required />
         <input v-model="editingStudent.gender" placeholder="Gender" required />
-        <input v-model="editingStudent.major" placeholder="Major" required />
+        <input v-model="editingStudent.class" placeholder="Class" required />
         <button type="submit">Update Student</button>
         <button type="button" @click="cancelEdit">Cancel</button>
       </form>

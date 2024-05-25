@@ -14,14 +14,16 @@ drop procedure if exists AddStudent;
 
 -- 学生基本信息表
 CREATE TABLE Students (
-    student_id VARCHAR(20) PRIMARY KEY NOT NULL,
+    student_id VARCHAR(10) PRIMARY KEY NOT NULL,
     name VARCHAR(100),
     gender ENUM('M', 'F') NOT NULL,
-    #birth_date DATE NOT NULL,
-    major VARCHAR(100),
-    # photo BLOB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    class VARCHAR(20),
+    phone VARCHAR(20),
+    photo BLOB
 );
+
+SHOW VARIABLES LIKE 'secure_file_priv';
+
 
 -- 专业变更表
 CREATE TABLE MajorChanges (
@@ -74,20 +76,20 @@ CREATE TABLE Files (
 
 
 CREATE PROCEDURE AddStudent(
-    IN student_id VARCHAR(20),
+    IN student_id VARCHAR(10),
     IN name VARCHAR(100),
     IN gender ENUM('M', 'F'),
-    #IN birth_date DATE,
-    IN major VARCHAR(100)
-    #IN photo BLOB
+    IN class VARCHAR(20),
+    IN phone VARCHAR(20),
+    IN photo BLOB
 )
 BEGIN
-    INSERT INTO Students (student_id,name, gender, major)
-    VALUES (student_id,name, gender, major);
+    INSERT INTO Students (student_id,name, gender, class,phone,photo)
+    VALUES (student_id,name, gender, class,phone,photo);
 END
 ;
-Call AddStudent('PB21111001','Tom', 'M', 'Computer Science');
-Call AddStudent('PB21111002','Jerry', 'F', 'Math');
-Call AddStudent('PB21111003','Alice', 'F',  'History');
-Call AddStudent('PB21111004','Bob', 'M', 'Computer Science');
+Call AddStudent('PB21111001','Tom', 'M', 'CS001','19337353643',LOAD_FILE('/home/affogato/ustc_db/lab2/backend/db/exp1.jpg'));
+Call AddStudent('PB21111002','Jerry', 'F', 'Ma002','18934372238','exp2.jpg');
+Call AddStudent('PB21111003','Alice', 'F',  'CS003','18137649812',null);
+Call AddStudent('PB21111004','Bob', 'M', 'CS001','13782648987',null);
 

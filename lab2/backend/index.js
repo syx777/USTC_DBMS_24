@@ -38,7 +38,15 @@ app.get('/api/students', (req, res) => {
         res.status(500).json({ error: 'Database query error' });
         return;
       }
-      res.json(results);
+      const studentsWithPhoto = results.map(student => {
+        if (student.photo) {
+          // 转换BLOB为Base64
+          student.photo = `data:image/jpeg;base64,${student.photo.toString('base64')}`;
+        }
+        return student;
+      });
+  
+      res.json(studentsWithPhoto);
     });
   });
 
@@ -46,16 +54,26 @@ app.get('/api/students', (req, res) => {
 app.post('/api/students', (req, res) => {
   const newStudent = req.body;
   console.log('Received new student:', newStudent); // 添加日志记录
-  const sql = 'INSERT INTO Students (student_id,name, gender, major) VALUES (?,?, ?, ?)';
-  db.query(sql, [newStudent.student_id,newStudent.name, newStudent.gender,newStudent.major], (err, result) => {
+  
+  const photoPath = path.join(__dirname, 'db', newStudent.photo); // 假设图片文件名存储在 photo 属性中
+  fs.readFile(photoPath, (err, photoData) => {
     if (err) {
-      console.error('Error inserting student:', err); // 错误日志
-      res.status(500).json({ error: err.message });
+      console.error('Error reading photo:', err);
+      res.status(500).json({ error: 'Error reading photo' });
       return;
     }
-    res.status(201).json({ id: result.insertId, ...newStudent });
+    const sql = 'INSERT INTO Students (student_id, name, gender, class, phone, photo) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(sql, [newStudent.student_id, newStudent.name, newStudent.gender, newStudent.class, newStudent.phone, photoData], (err, result) => {
+      if (err) {
+        console.error('Error inserting student:', err); // 错误日志
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.status(201).json({ id: result.insertId, ...newStudent });
+    });
   });
 });
+
 
 // 更新学生
 app.put('/api/students/:id', (req, res) => {
