@@ -6,6 +6,7 @@
       <input v-model="newStudent.name" placeholder="Name" required />
       <input v-model="newStudent.gender" placeholder="Gender" required />
       <input v-model="newStudent.class" placeholder="Class" required />
+      <input type="file" @change="onFileChange($event, 'newStudent')" />
       <button type="submit">Add Student</button>
     </form>
     <ul>
@@ -22,6 +23,7 @@
         <input v-model="editingStudent.name" placeholder="Name" required />
         <input v-model="editingStudent.gender" placeholder="Gender" required />
         <input v-model="editingStudent.class" placeholder="Class" required />
+        <input type="file" @change="onFileChange($event, 'editingStudent')" />
         <button type="submit">Update Student</button>
         <button type="button" @click="cancelEdit">Cancel</button>
       </form>
@@ -42,7 +44,8 @@ export default {
         name: '',
         gender: '',
         birth_date: '',
-        major: ''
+        major: '',
+        photo: null
       },
       editingStudent: null
     };
@@ -60,29 +63,65 @@ export default {
           console.error(error);
         });
     },
+    onFileChange(event, studentType) {
+      const file = event.target.files[0];
+      if (studentType === 'newStudent') {
+        this.newStudent.photo = file;
+      } else if (studentType === 'editingStudent') {
+        this.editingStudent.photo = file;
+      }
+    },
     addStudent() {
-      axios.post('http://localhost:3001/api/students', this.newStudent)
-        .then((response) => {
+      const formData = new FormData();
+      formData.append('student_id', this.newStudent.student_id);
+      formData.append('name', this.newStudent.name);
+      formData.append('gender', this.newStudent.gender);
+      formData.append('class', this.newStudent.class);
+      if (this.newStudent.photo) {
+        formData.append('photo', this.newStudent.photo);
+      }
+
+      axios.post('http://localhost:3001/api/students', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+        .then(response => {
           console.log('Student added:', response.data); // 添加日志记录
-          this.fetchStudents(); // 重新获取学生列表
+          this.fetchStudents();
           this.newStudent = {
+            student_id:'',
             name: '',
             gender: '',
             birth_date: '',
-            major: ''
+            major: '',
+            photo: null
           };
         })
         .catch(error => {
-          console.error('Error adding student:', error); // 错误日志
+          console.error('Error adding student:', error);
         });
     },
     editStudent(student) {
-      this.editingStudent = { ...student };
+      this.editingStudent = { ...student, photo: null };
     },
     updateStudent() {
-      axios.put(`http://localhost:3001/api/students/${this.editingStudent.student_id}`, this.editingStudent)
+      const formData = new FormData();
+      formData.append('student_id', this.editingStudent.student_id);
+      formData.append('name', this.editingStudent.name);
+      formData.append('gender', this.editingStudent.gender);
+      formData.append('class', this.editingStudent.class);
+      if (this.editingStudent.photo) {
+        formData.append('photo', this.editingStudent.photo);
+      }
+
+      axios.put(`http://localhost:3001/api/students/${this.editingStudent.student_id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
         .then(() => {
-          this.fetchStudents(); // 重新获取学生列表
+          this.fetchStudents();
           this.editingStudent = null;
         })
         .catch(error => {
@@ -92,7 +131,7 @@ export default {
     deleteStudent(id) {
       axios.delete(`http://localhost:3001/api/students/${id}`)
         .then(() => {
-          this.fetchStudents(); // 重新获取学生列表
+          this.fetchStudents();
         })
         .catch(error => {
           console.error(error);
@@ -104,6 +143,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .students {

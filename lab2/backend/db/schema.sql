@@ -1,4 +1,4 @@
-SET FOREIGN_KEY_CHECKS=0;
+/* SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE IF NOT EXISTS SchoolManagementSystem;
 USE SchoolManagementSystem;
 
@@ -93,3 +93,4 @@ Call AddStudent('PB21111002','Jerry', 'F', 'Ma002','18934372238',LOAD_FILE('/var
 Call AddStudent('PB21111003','Alice', 'F',  'CS003','18137649812',null);
 Call AddStudent('PB21111004','Bob', 'M', 'CS001','13782648987',null);
 
+ */
