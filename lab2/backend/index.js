@@ -30,23 +30,9 @@ db.connect((err) => {
   });
 });
 
-// 设置 multer 存储配置
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  }
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// 创建上传目录（如果不存在）
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
 
 app.get('/api/students', (req, res) => {
   console.log('Received request for /api/students');
@@ -59,7 +45,7 @@ app.get('/api/students', (req, res) => {
     }
     const studentsWithPhoto = results.map(student => {
       if (student.photo) {
-        student.photo = `http://localhost:3001/${student.photo}`;
+        student.photo = `data:image/jpeg;base64,${student.photo.toString('base64')}`;
       }
       return student;
     });
@@ -71,26 +57,25 @@ app.get('/api/students', (req, res) => {
 // 添加学生
 app.post('/api/students', upload.single('photo'), (req, res) => {
   const newStudent = req.body;
-  const photoPath = req.file ? req.file.path : null;
+  const photoData = req.file ? req.file.buffer : null;
 
   const sql = 'INSERT INTO Students (student_id, name, gender, class, phone, photo) VALUES (?, ?, ?, ?, ?, ?)';
-  db.query(sql, [newStudent.student_id, newStudent.name, newStudent.gender, newStudent.class, newStudent.phone, photoPath], (err, result) => {
+  db.query(sql, [newStudent.student_id, newStudent.name, newStudent.gender, newStudent.class, newStudent.phone, photoData], (err, result) => {
     if (err) {
       console.error('Error inserting student:', err);
       res.status(500).json({ error: err.message });
       return;
     }
-    res.status(201).json({ id: result.insertId, ...newStudent, photo: photoPath });
+    res.status(201).json({ id: result.insertId, ...newStudent });
   });
 });
 
 // 更新学生
 app.put('/api/students/:id', upload.single('photo'), (req, res) => {
   const updatedStudent = req.body;
-  const photoPath = req.file ? req.file.path : updatedStudent.photo;
-
-  const sql = 'UPDATE Students SET name = ?, gender = ?, major = ?, photo = ? WHERE student_id = ?';
-  db.query(sql, [updatedStudent.name, updatedStudent.gender, updatedStudent.major, photoPath, req.params.id], (err, result) => {
+  const photoData = req.file ? req.file.buffer : null;
+  const sql = 'UPDATE Students SET name = ?, gender = ?, class = ?, phone = ?, photo=? WHERE student_id = ?';
+  db.query(sql, [updatedStudent.name, updatedStudent.gender, updatedStudent.class,updatedStudent.phone,photoData, req.params.id], (err, result) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -111,8 +96,6 @@ app.delete('/api/students/:id', (req, res) => {
   });
 });
 
-// 提供静态文件服务
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = 3001;
 app.listen(PORT, () => {
