@@ -94,3 +94,7 @@ Call AddStudent('PB21111003','Alice', 'F',  'CS003','18137649812',null);
 Call AddStudent('PB21111004','Bob', 'M', 'CS001','13782648987',null);
 
  */
+SHOW VARIABLES LIKE 'max_allowed_packet';
+DESCRIBE Students;
+ALTER TABLE Students MODIFY photo LONGBLOB;
+SHOW VARIABLES LIKE 'max_allowed_packet';

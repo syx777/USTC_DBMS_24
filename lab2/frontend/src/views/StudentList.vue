@@ -6,6 +6,7 @@
       <input v-model="newStudent.name" placeholder="Name" required />
       <input v-model="newStudent.gender" placeholder="Gender" required />
       <input v-model="newStudent.class" placeholder="Class" required />
+      <input v-model="newStudent.phone" placeholder="Phone" required />
       <input type="file" @change="onFileChange($event, 'newStudent')" />
       <button type="submit">Add Student</button>
     </form>
@@ -23,6 +24,7 @@
         <input v-model="editingStudent.name" placeholder="Name" required />
         <input v-model="editingStudent.gender" placeholder="Gender" required />
         <input v-model="editingStudent.class" placeholder="Class" required />
+        <input v-model="editingStudent.phone" placeholder="Phone" required />
         <input type="file" @change="onFileChange($event, 'editingStudent')" />
         <button type="submit">Update Student</button>
         <button type="button" @click="cancelEdit">Cancel</button>

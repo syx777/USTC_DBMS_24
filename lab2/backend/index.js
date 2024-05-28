@@ -19,23 +19,43 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-  if (err) throw err;
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    process.exit(1);
+  }
   console.log('MySQL connected...');
 
   const schemaPath = path.join(__dirname, 'db', 'schema.sql');
   const schema = fs.readFileSync(schemaPath, 'utf-8');
   db.query(schema, (err, result) => {
-    if (err) throw err;
+    if (err) {
+      console.error('Error creating database and tables:', err);
+      process.exit(1);
+    }
     console.log('Database and tables created...');
   });
 });
 
-const storage = multer.memoryStorage();
+// 配置 multer 用于保存文件到服务器
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
 const upload = multer({ storage });
 
+// 确保上传目录存在
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
 
+// 获取所有学生信息
 app.get('/api/students', (req, res) => {
-  console.log('Received request for /api/students');
   const sql = 'SELECT * FROM Students';
   db.query(sql, (err, results) => {
     if (err) {
@@ -45,7 +65,7 @@ app.get('/api/students', (req, res) => {
     }
     const studentsWithPhoto = results.map(student => {
       if (student.photo) {
-        student.photo = `data:image/jpeg;base64,${student.photo.toString('base64')}`;
+        student.photo = `http://localhost:3001/${student.photo}`;
       }
       return student;
     });
@@ -57,26 +77,28 @@ app.get('/api/students', (req, res) => {
 // 添加学生
 app.post('/api/students', upload.single('photo'), (req, res) => {
   const newStudent = req.body;
-  const photoData = req.file ? req.file.buffer : null;
+  const photoPath = req.file ? req.file.path : null;
 
-  const sql = 'INSERT INTO Students (student_id, name, gender, class, phone, photo) VALUES (?, ?, ?, ?, ?, ?)';
-  db.query(sql, [newStudent.student_id, newStudent.name, newStudent.gender, newStudent.class, newStudent.phone, photoData], (err, result) => {
+  const sql = 'CALL AddStudent (?, ?, ?, ?, ?, ?)';
+  db.query(sql, [newStudent.student_id, newStudent.name, newStudent.gender, newStudent.class, newStudent.phone, photoPath], (err, result) => {
     if (err) {
       console.error('Error inserting student:', err);
       res.status(500).json({ error: err.message });
       return;
     }
-    res.status(201).json({ id: result.insertId, ...newStudent });
+    res.status(201).json({ id: result.insertId, ...newStudent, photo: photoPath });
   });
 });
 
-// 更新学生
+// 更新学生信息
 app.put('/api/students/:id', upload.single('photo'), (req, res) => {
   const updatedStudent = req.body;
-  const photoData = req.file ? req.file.buffer : null;
-  const sql = 'UPDATE Students SET name = ?, gender = ?, class = ?, phone = ?, photo=? WHERE student_id = ?';
-  db.query(sql, [updatedStudent.name, updatedStudent.gender, updatedStudent.class,updatedStudent.phone,photoData, req.params.id], (err, result) => {
+  const photoPath = req.file ? req.file.path : null;
+
+  const sql = 'UPDATE Students SET name = ?, gender = ?, class = ?, phone = ?, photo = ? WHERE student_id = ?';
+  db.query(sql, [updatedStudent.name, updatedStudent.gender, updatedStudent.class, updatedStudent.phone, photoPath, req.params.id], (err, result) => {
     if (err) {
+      console.error('Error updating student:', err);
       res.status(500).json({ error: err.message });
       return;
     }
@@ -89,6 +111,7 @@ app.delete('/api/students/:id', (req, res) => {
   const sql = 'DELETE FROM Students WHERE student_id = ?';
   db.query(sql, [req.params.id], (err, result) => {
     if (err) {
+      console.error('Error deleting student:', err);
       res.status(500).json({ error: err.message });
       return;
     }
@@ -96,6 +119,8 @@ app.delete('/api/students/:id', (req, res) => {
   });
 });
 
+// 启动服务器并提供静态文件服务
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = 3001;
 app.listen(PORT, () => {
