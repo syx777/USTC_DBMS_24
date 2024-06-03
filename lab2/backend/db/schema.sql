@@ -81,7 +81,7 @@ CREATE PROCEDURE AddStudent(
     IN gender ENUM('M', 'F'),
     IN class VARCHAR(20),
     IN phone VARCHAR(20),
-    IN photo BLOB
+    IN photo LONGBLOB
 )
 BEGIN
     INSERT INTO Students (student_id,name, gender, class,phone,photo)
@@ -93,8 +93,12 @@ Call AddStudent('PB21111002','Jerry', 'F', 'Ma002','18934372238',LOAD_FILE('/var
 Call AddStudent('PB21111003','Alice', 'F',  'CS003','18137649812',null);
 Call AddStudent('PB21111004','Bob', 'M', 'CS001','13782648987',null);
 
- */
+
 SHOW VARIABLES LIKE 'max_allowed_packet';
+DROP PROCEDURE IF EXISTS AddStudent;
 DESCRIBE Students;
 ALTER TABLE Students MODIFY photo LONGBLOB;
+ALTER PROCEDURE `AddStudent` MODIFY photo LONGBLOB;
 SHOW VARIABLES LIKE 'max_allowed_packet';
+
+*/

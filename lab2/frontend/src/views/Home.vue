@@ -1,7 +1,7 @@
 <!-- src/views/Home.vue -->
 <template>
     <div class="home">
-      <h1>学籍管理系统</h1>
+      <h1></h1>
     </div>
   </template>
   

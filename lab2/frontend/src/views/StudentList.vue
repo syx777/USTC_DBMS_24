@@ -45,8 +45,8 @@ export default {
         student_id:'',
         name: '',
         gender: '',
-        birth_date: '',
-        major: '',
+        class: '',
+        phone: '',
         photo: null
       },
       editingStudent: null
@@ -79,6 +79,7 @@ export default {
       formData.append('name', this.newStudent.name);
       formData.append('gender', this.newStudent.gender);
       formData.append('class', this.newStudent.class);
+      formData.append('phone', this.newStudent.phone);
       if (this.newStudent.photo) {
         formData.append('photo', this.newStudent.photo);
       }
@@ -95,8 +96,8 @@ export default {
             student_id:'',
             name: '',
             gender: '',
-            birth_date: '',
-            major: '',
+            class: '',
+            phone: '',
             photo: null
           };
         })
@@ -113,6 +114,7 @@ export default {
       formData.append('name', this.editingStudent.name);
       formData.append('gender', this.editingStudent.gender);
       formData.append('class', this.editingStudent.class);
+      formData.append('phone', this.editingStudent.phone);
       if (this.editingStudent.photo) {
         formData.append('photo', this.editingStudent.photo);
       }
