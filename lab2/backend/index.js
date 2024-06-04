@@ -119,6 +119,19 @@ app.delete('/api/students/:id', (req, res) => {
   });
 });
 
+//获取所有班级信息
+app.get('/api/classes', (req, res) => {
+  const sql = 'SELECT * FROM Class';
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.status(500).json({ error: 'Database query error' });
+      return;
+    }
+    return res.json(result);
+  });
+});
+
 // 启动服务器并提供静态文件服务
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

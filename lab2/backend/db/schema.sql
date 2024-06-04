@@ -1,11 +1,11 @@
 /* SET FOREIGN_KEY_CHECKS=0;
-CREATE DATABASE IF NOT EXISTS SchoolManagementSystem;
+CREATE DATABASE IF NOT EXISTS SchoolManagementSystem;*/
 USE SchoolManagementSystem;
 
-drop table if exists MajorChanges;
+/*drop table if exists MajorChanges;
 drop table if exists AwardsPunishments;
 drop table if exists CourseGrades;
-drop table if exists Files;
+drop table if exists Class;
 drop table if exists Courses;
 drop table if exists Students;
 drop procedure if exists AddStudent;
@@ -102,3 +102,11 @@ ALTER PROCEDURE `AddStudent` MODIFY photo LONGBLOB;
 SHOW VARIABLES LIKE 'max_allowed_packet';
 
 */
+
+/* 班级信息表 */
+/* CREATE TABLE Class (
+    class_id VARCHAR(20) PRIMARY KEY NOT NULL,
+    major VARCHAR(50) NOT NULL,
+    grade INT NOT NULL
+);
+INSERT INTO Class (class_id, major, grade) VALUES ('CS001', 'Computer Science', 2021); */
