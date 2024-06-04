@@ -21,7 +21,7 @@
           </tr>
           <tr>
             <td><label for="phone">电话</label></td>
-            <td><input v-model="form.phone" id="phone" type="text" required /></td>
+            <td><input v-model="form.phone" id="phone" type="text" /></td>
           </tr>
           <tr>
             <td><label for="photo">照片</label></td>
@@ -67,68 +67,79 @@ export default {
   },
   created() {
     if (this.$route.params.student) {
-      try {
-        this.student = JSON.parse(this.$route.params.student);
-      } catch (error) {
-        console.error('Error parsing student:', error);
+    try {
+      this.student = JSON.parse(this.$route.params.student);
+      console.log('Editing student:', this.student.photo);
+      this.form.student_id = this.student.student_id || '';
+      this.form.name = this.student.name || '';
+      this.form.gender = this.student.gender || '';
+      this.form.class = this.student.class || '';
+      this.form.phone = this.student.phone || '';
+      if (this.student.photo) {
+        this.form.photoUrl = this.student.photo;
       }
-    } else {
-      this.student = {};
+    } catch (error) {
+      console.error('Error parsing student:', error);
     }
+  } else {
+    this.student = {};
+  }
+},
+methods: {
+  onFileChange(event) {
+    const file = event.target.files[0];
+    this.form.photo = file;
+    this.form.photoUrl = URL.createObjectURL(file);
   },
-  methods: {
-    onFileChange(event) {
-      const file = event.target.files[0];
-      this.form.photo = file;
-      this.form.photoUrl = URL.createObjectURL(file);
-    },
-    viewPhoto() {
-      this.showPhotoModal = true;
-    },
-    closePhotoModal() {
-      this.showPhotoModal = false;
-    },
-    submitForm() {
-      const formData = new FormData();
-      formData.append('student_id', this.form.student_id);
-      formData.append('name', this.form.name);
-      formData.append('gender', this.form.gender);
-      formData.append('class', this.form.class);
-      formData.append('phone', this.form.phone);
-      if (this.form.photo) {
-        formData.append('photo', this.form.photo);
-      }
+  viewPhoto() {
+    this.showPhotoModal = true;
+  },
+  closePhotoModal() {
+    this.showPhotoModal = false;
+  },
+  submitForm() {
+    const formData = new FormData();
+    formData.append('student_id', this.form.student_id);
+    formData.append('name', this.form.name);
+    formData.append('gender', this.form.gender);
+    formData.append('class', this.form.class);
+    formData.append('phone', this.form.phone);
+    if (this.form.photo) {
+      formData.append('photo', this.form.photo);
+    } else if (this.form.photoUrl) {
+      formData.append('photoUrl', this.form.photoUrl);
+    }
 
-      const studentId = this.form.student_id;
-      if (this.$route.params.student) {
-        // 编辑学生
-        axios.put(`http://localhost:3001/api/students/${studentId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-          .then(() => {
-            router.push({ name: 'StudentList' });
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      } else {
-        // 添加学生
-        axios.post('http://localhost:3001/api/students', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-          .then(() => {
-            router.push({ name: 'StudentList' });
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      }
+    const studentId = this.form.student_id;
+    if (this.$route.params.student) {
+      // 编辑学生
+      axios.put(`http://localhost:3001/api/students/${studentId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(() => {
+        router.push({ name: 'StudentList' });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    } else {
+      // 添加学生
+      axios.post('http://localhost:3001/api/students', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(() => {
+        router.push({ name: 'StudentList' });
+      })
+      .catch(error => {
+        console.error(error);
+      });
     }
   }
+}
 };
 </script>
 
