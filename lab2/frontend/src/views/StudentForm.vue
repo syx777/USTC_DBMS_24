@@ -30,13 +30,12 @@
               <button v-if="form.photoUrl" @click="viewPhoto" type="button">查看</button>
             </td>
           </tr>
-          <tr>
-            <td colspan="2">
-              <button type="submit">提交</button>
-            </td>
-          </tr>
         </tbody>
-      </table>
+        </table>
+        <div class="button-container">
+    <button type="submit">提交</button>
+    <button @click="returnStudentList">返回</button>
+  </div>
     </form>
 
     <div v-if="showPhotoModal" class="modal" @click="closePhotoModal">
@@ -97,6 +96,9 @@ methods: {
   closePhotoModal() {
     this.showPhotoModal = false;
   },
+  returnStudentList() {
+    router.push({ name: 'StudentList' });
+  },
   submitForm() {
     const formData = new FormData();
     formData.append('student_id', this.form.student_id);
@@ -149,6 +151,11 @@ methods: {
   margin-top: 150px;
   width: 50%;
   padding: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
 }
 
 table {
