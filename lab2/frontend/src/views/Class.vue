@@ -23,6 +23,12 @@
         </table>
         <button class="add-class-button" @click="navigateToAddClass">添加班级</button>
     </div>
+    <div class="search-bar">
+        <input type="text" v-model="searchCriteria.class_id" placeholder="班级编号" />
+        <input type="text" v-model="searchCriteria.major" placeholder="学院" />
+        <input type="text" v-model="searchCriteria.grade" placeholder="年级" />
+        <button @click="searchClasses">查询</button>
+    </div>
 </template>
 
 <script>
@@ -33,7 +39,12 @@ export default {
     name: 'ClassList',
     data() {
         return {
-            classes: []
+            classes: [],
+            searchCriteria: {
+                class_id: '',
+                major: '',
+                grade: ''
+            }
         };
     },
     created() {
@@ -42,6 +53,15 @@ export default {
     methods: {
         fetchClasses() {
             axios.get('http://localhost:3001/api/classes')
+                .then(response => {
+                    this.classes = response.data;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+        searchClasses() {
+            axios.get('http://localhost:3001/api/classes/search', { params: this.searchCriteria })
                 .then(response => {
                     this.classes = response.data;
                 })
@@ -73,6 +93,15 @@ export default {
     padding: 20px;
 }
 
+.search-bar {
+  margin-bottom: 20px;
+  margin-left: 250px;
+}
+
+.search-bar input {
+  margin-right: 10px;
+}
+
 .add-class-button {
     margin-top: 20px;
     margin-left: 250px;
@@ -80,9 +109,9 @@ export default {
 
 table {
     margin-top: 150px;
-  margin-left: 250px;
-  width: 80%;
-  border-collapse: collapse;
+    margin-left: 250px;
+    width: 80%;
+    border-collapse: collapse;
 }
 
 th,

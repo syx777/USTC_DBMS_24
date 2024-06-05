@@ -33,7 +33,15 @@
       <img :src="currentPhoto" alt="Student Photo" />
     </modal>
   </div>
+  <div class="search-bar">
+      <input type="text" v-model="searchCriteria.student_id" placeholder="学号" />
+      <input type="text" v-model="searchCriteria.name" placeholder="姓名" />
+      <input type="text" v-model="searchCriteria.gender" placeholder="性别" />
+      <input type="text" v-model="searchCriteria.class" placeholder="班级" />
+      <button @click="searchStudents">查询</button>
+    </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -49,7 +57,13 @@ export default {
     return {
       students: [],
       showPhotoModal: false,
-      currentPhoto: null
+      currentPhoto: null,
+      searchCriteria: {
+        student_id: '',
+        name: '',
+        gender:'',
+        class: ''
+      }
     };
   },
   created() {
@@ -58,6 +72,15 @@ export default {
   methods: {
     fetchStudents() {
       axios.get('http://localhost:3001/api/students')
+        .then(response => {
+          this.students = response.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    searchStudents() {
+      axios.get('http://localhost:3001/api/students/search', { params: this.searchCriteria })
         .then(response => {
           this.students = response.data;
         })
@@ -77,7 +100,7 @@ export default {
       router.push({ name: 'StudentForm', params: { student: JSON.stringify(student) } });
     },
     deleteStudent(id) {
-      axios.deleteStudent(`http://localhost:3001/api/students/${id}`)
+      axios.delete(`http://localhost:3001/api/students/${id}`)
         .then(() => {
           this.fetchStudents();
         })
@@ -89,9 +112,19 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .students {
   padding: 20px;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+  margin-left: 250px;
+}
+
+.search-bar input {
+  margin-right: 10px;
 }
 
 .add-student-button {
@@ -123,3 +156,4 @@ button {
   max-width: 100%;
 }
 </style>
+

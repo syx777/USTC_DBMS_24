@@ -74,6 +74,47 @@ app.get('/api/students', (req, res) => {
   });
 });
 
+app.get('/api/students/search', (req, res) => {
+  const { student_id, name, gender, class: className } = req.query;
+  let sql = 'SELECT * FROM Students WHERE 1=1';
+  const params = [];
+
+  if (student_id) {
+    sql += ' AND student_id = ?';
+    params.push(student_id);
+  }
+
+  if (name) {
+    sql += ' AND name LIKE ?';
+    params.push(`%${name}%`);
+  }
+  if (gender) {
+    sql += ' AND gender = ?';
+    params.push(gender);
+  }
+
+  if (className) {
+    sql += ' AND class = ?';
+    params.push(className);
+  }
+
+  db.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.status(500).json({ error: 'Database query error' });
+      return;
+    }
+    const studentsWithPhoto = results.map(student => {
+      if (student.photo) {
+        student.photo = `http://localhost:3001/${student.photo}`;
+      }
+      return student;
+    });
+
+    res.json(studentsWithPhoto);
+  });
+});
+
 // 添加学生
 app.post('/api/students', upload.single('photo'), (req, res) => {
   const newStudent = req.body;
@@ -165,4 +206,32 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
+});
+app.get('/api/classes/search', (req, res) => {
+  const { class_id, major, grade} = req.query;
+  let sql = 'SELECT * FROM Class WHERE 1=1';
+  const params = [];
+
+  if (class_id) {
+    sql += ' AND class_id = ?';
+    params.push(class_id);
+  }
+
+  if (major) {
+    sql += ' AND major LIKE ?';
+    params.push(`%${major}%`);
+  }
+  if (grade) {
+    sql += ' AND grade = ?';
+    params.push(grade);
+  }
+  return db.query(sql, params, (err, result) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.status(500).json({ error: 'Database query error' });
+      return;
+    }
+    return res.json(result);
+  });
+
 });
