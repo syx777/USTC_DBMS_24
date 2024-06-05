@@ -77,7 +77,7 @@ export default {
       router.push({ name: 'StudentForm', params: { student: JSON.stringify(student) } });
     },
     deleteStudent(id) {
-      axios.delete(`http://localhost:3001/api/students/${id}`)
+      axios.deleteStudent(`http://localhost:3001/api/students/${id}`)
         .then(() => {
           this.fetchStudents();
         })

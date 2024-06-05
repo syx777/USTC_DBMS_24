@@ -132,6 +132,33 @@ app.get('/api/classes', (req, res) => {
   });
 });
 
+//添加班级
+app.post('/api/classes', (req, res) => {
+  const newClass = req.body;
+  const sql = 'INSERT INTO Class (class_id, major,grade) VALUES (?, ?,?)';
+  db.query(sql, [newClass.class_id, newClass.major, newClass.grade], (err, result) => {
+    if (err) {
+      console.error('Error inserting class:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.status(201).json({ id: result.insertId, ...newClass });
+  });
+});
+
+//更新班级信息
+app.put('/api/classes/:id', (req, res) => {
+  const updatedClass = req.body;
+  const sql = 'UPDATE Class SET major = ?, grade = ? WHERE class_id = ?';
+  db.query(sql, [updatedClass.major, updatedClass.grade, req.params.id], (err, result) => {
+    if (err) {
+      console.error('Error updating class:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(result);
+  });
+});
 // 启动服务器并提供静态文件服务
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

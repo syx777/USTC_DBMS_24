@@ -6,7 +6,7 @@
                     <th>班级编号</th>
                     <th>学院</th>
                     <th>年级</th>
-<!--                     <th>操作</th> -->
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -14,30 +14,33 @@
                     <td>{{ classk.class_id }}</td>
                     <td>{{ classk.major }}</td>
                     <td>{{ classk.grade }}</td>
+                    <td>
+                        <button @click="navigateToEditClass(classk)">修改</button>
+                        <button @click="deleteClass(classk.class_id)">删除</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
-<!--         <button class="add-student-button" @click="navigateToAddStudent">添加班级</button> -->
+        <button class="add-class-button" @click="navigateToAddClass">添加班级</button>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import router from '../router';
 
 export default {
     name: 'ClassList',
-    components: {
-    },
     data() {
         return {
             classes: []
         };
     },
     created() {
-        this.fetchStudents();
+        this.fetchClasses();
     },
     methods: {
-        fetchStudents() {
+        fetchClasses() {
             axios.get('http://localhost:3001/api/classes')
                 .then(response => {
                     this.classes = response.data;
@@ -46,22 +49,21 @@ export default {
                     console.error(error);
                 });
         },
-/*         navigateToAddStudent() {
-            router.push({ name: 'StudentForm', params: { student: null } });
+        navigateToAddClass() {
+            router.push({ name: 'ClassForm', params: { classk: null } });
         },
-        navigateToEditStudent(student) {
-            console.log('Navigating to edit student:', student);
-            router.push({ name: 'StudentForm', params: { student: JSON.stringify(student) } });
+        navigateToEditClass(classk) {
+            router.push({ name: 'ClassForm', params: { classk: JSON.stringify(classk) } });
         },
-        deleteStudent(id) {
-            axios.delete(`http://localhost:3001/api/students/${id}`)
+        deleteClass(id) {
+            axios.delete(`http://localhost:3001/api/classes/${id}`)
                 .then(() => {
-                    this.fetchStudents();
+                    this.fetchClasses();
                 })
                 .catch(error => {
                     console.error(error);
                 });
-        } */
+        }
     }
 };
 </script>
@@ -71,16 +73,16 @@ export default {
     padding: 20px;
 }
 
-.add-student-button {
+.add-class-button {
     margin-top: 20px;
     margin-left: 250px;
 }
 
 table {
     margin-top: 150px;
-    margin-left: 250px;
-    width: 80%;
-    border-collapse: collapse;
+  margin-left: 250px;
+  width: 80%;
+  border-collapse: collapse;
 }
 
 th,
@@ -95,9 +97,5 @@ th {
 
 button {
     margin: 5px;
-}
-
-.modal img {
-    max-width: 100%;
 }
 </style>

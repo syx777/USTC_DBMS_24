@@ -31,11 +31,11 @@
             </td>
           </tr>
         </tbody>
-        </table>
-        <div class="button-container">
-    <button type="submit">提交</button>
-    <button @click="returnStudentList">返回</button>
-  </div>
+      </table>
+      <div class="button-container">
+        <button type="submit">提交</button>
+        <button @click="returnStudentList">返回</button>
+      </div>
     </form>
 
     <div v-if="showPhotoModal" class="modal" @click="closePhotoModal">
@@ -65,83 +65,84 @@ export default {
     };
   },
   created() {
+    console.log('created() started');
     if (this.$route.params.student) {
-    try {
-      this.student = JSON.parse(this.$route.params.student);
-      console.log('Editing student:', this.student.photo);
-      this.form.student_id = this.student.student_id || '';
-      this.form.name = this.student.name || '';
-      this.form.gender = this.student.gender || '';
-      this.form.class = this.student.class || '';
-      this.form.phone = this.student.phone || '';
-      if (this.student.photo) {
-        this.form.photoUrl = this.student.photo;
+      try {
+        this.student = JSON.parse(this.$route.params.student);
+        console.log('Editing student:', this.student.photo);
+        this.form.student_id = this.student.student_id || '';
+        this.form.name = this.student.name || '';
+        this.form.gender = this.student.gender || '';
+        this.form.class = this.student.class || '';
+        this.form.phone = this.student.phone || '';
+        if (this.student.photo) {
+          this.form.photoUrl = this.student.photo;
+        }
+      } catch (error) {
+        console.error('Error parsing student:', error);
       }
-    } catch (error) {
-      console.error('Error parsing student:', error);
-    }
-  } else {
-    this.student = {};
-  }
-},
-methods: {
-  onFileChange(event) {
-    const file = event.target.files[0];
-    this.form.photo = file;
-    this.form.photoUrl = URL.createObjectURL(file);
-  },
-  viewPhoto() {
-    this.showPhotoModal = true;
-  },
-  closePhotoModal() {
-    this.showPhotoModal = false;
-  },
-  returnStudentList() {
-    router.push({ name: 'StudentList' });
-  },
-  submitForm() {
-    const formData = new FormData();
-    formData.append('student_id', this.form.student_id);
-    formData.append('name', this.form.name);
-    formData.append('gender', this.form.gender);
-    formData.append('class', this.form.class);
-    formData.append('phone', this.form.phone);
-    if (this.form.photo) {
-      formData.append('photo', this.form.photo);
-    } else if (this.form.photoUrl) {
-      formData.append('photoUrl', this.form.photoUrl);
-    }
-
-    const studentId = this.form.student_id;
-    if (this.$route.params.student) {
-      // 编辑学生
-      axios.put(`http://localhost:3001/api/students/${studentId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      .then(() => {
-        router.push({ name: 'StudentList' });
-      })
-      .catch(error => {
-        console.error(error);
-      });
     } else {
-      // 添加学生
-      axios.post('http://localhost:3001/api/students', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      .then(() => {
-        router.push({ name: 'StudentList' });
-      })
-      .catch(error => {
-        console.error(error);
-      });
+      this.student = {};
+    }
+  },
+  methods: {
+    onFileChange(event) {
+      const file = event.target.files[0];
+      this.form.photo = file;
+      this.form.photoUrl = URL.createObjectURL(file);
+    },
+    viewPhoto() {
+      this.showPhotoModal = true;
+    },
+    closePhotoModal() {
+      this.showPhotoModal = false;
+    },
+    returnStudentList() {
+      router.push({ name: 'StudentList' });
+    },
+    submitForm() {
+      const formData = new FormData();
+      formData.append('student_id', this.form.student_id);
+      formData.append('name', this.form.name);
+      formData.append('gender', this.form.gender);
+      formData.append('class', this.form.class);
+      formData.append('phone', this.form.phone);
+      if (this.form.photo) {
+        formData.append('photo', this.form.photo);
+      } else if (this.form.photoUrl) {
+        formData.append('photoUrl', this.form.photoUrl);
+      }
+
+      const studentId = this.form.student_id;
+      if (this.$route.params.student) {
+        // 编辑学生
+        axios.put(`http://localhost:3001/api/students/${studentId}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+          .then(() => {
+            router.push({ name: 'StudentList' });
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      } else {
+        // 添加学生
+        axios.post('http://localhost:3001/api/students', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+          .then(() => {
+            router.push({ name: 'StudentList' });
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
     }
   }
-}
 };
 </script>
 
