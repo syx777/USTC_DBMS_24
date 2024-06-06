@@ -235,3 +235,91 @@ app.get('/api/classes/search', (req, res) => {
   });
 
 });
+
+//获取所有课程信息
+app.get('/api/courses', (req, res) => {
+  const sql = 'SELECT course_id, teacher_name, course_place, credits FROM Courses';
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.status(500).json({ error: 'Database query error' });
+      return;
+    }
+    return res.json(result);
+  });
+});
+
+//添加课程
+app.post('/api/courses', (req, res) => {
+  const newCourse = req.body;
+  const sql = 'INSERT INTO Courses (course_id, teacher_name, course_place, credits) VALUES (?, ?, ?, ?)';
+  db.query(sql, [newCourse.course_id, newCourse.teacher_name, newCourse.course_place, newCourse.credits], (err, result) => {
+    if (err) {
+      console.error('Error inserting course:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.status(201).json({ id: result.insertId, ...newCourse });
+  });
+});
+
+//更新课程信息
+app.put('/api/courses/:id', (req, res) => {
+  const updatedCourse = req.body;
+  const sql = 'UPDATE Courses SET teacher_name = ?, course_place = ?, credits = ? WHERE course_id = ?';
+  db.query(sql, [updatedCourse.teacher_name, updatedCourse.course_place, updatedCourse.credits, req.params.id], (err, result) => {
+    if (err) {
+      console.error('Error updating course:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(result);
+  });
+});
+
+//查询课程
+app.get('/api/courses/search', (req, res) => {
+  const { course_id, teacher_name, course_place, credits } = req.query;
+  let sql = 'SELECT * FROM Courses WHERE 1=1';
+  const params = [];
+
+  if (course_id) {
+    sql += ' AND course_id = ?';
+    params.push(course_id);
+  }
+
+  if (teacher_name) {
+    sql += ' AND teacher_name LIKE ?';
+    params.push(`%${teacher_name}%`);
+  }
+  if (course_place) {
+    sql += ' AND course_place = ?';
+    params.push(course_place);
+  }
+  if (credits) {
+    sql += ' AND credits = ?';
+    params.push(credits);
+  }
+  return db.query(sql, params, (err, result) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.status(500).json({ error: 'Database query error' });
+      return;
+    }
+    return res.json(result);
+  });
+
+});
+
+//删除课程
+app.delete('/api/courses/:id', (req, res) => {
+  const sql = 'DELETE FROM Courses WHERE course_id = ?';
+  db.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      console.error('Error deleting course:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(result);
+  });
+});

@@ -3,17 +3,19 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import StudentList from '../views/StudentList.vue';
 import StudentForm from '../views/StudentForm.vue';
-import Courses from '../views/Courses.vue';
 import Class from '../views/Class.vue';
 import ClassForm from '../views/ClassForm.vue';
+import Course from '../views/Course.vue';
+import CourseForm from '../views/CourseForm.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/students', name: 'StudentList', component: StudentList },
   { path: '/student-form', name: 'StudentForm', component: StudentForm, props: true },
-  { path: '/courses', name: 'Courses', component: Courses },
+  { path: '/course', name: 'Course', component: Course },
   { path: '/class', name: 'Class', component: Class },
-  { path: '/class-form', name: 'ClassForm', component: ClassForm, props: true }
+  { path: '/class-form', name: 'ClassForm', component: ClassForm, props: true },
+  { path: '/course-form', name: 'CourseForm', component: CourseForm, props: true }
 ];
 
 const router = createRouter({

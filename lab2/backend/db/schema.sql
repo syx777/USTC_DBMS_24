@@ -122,3 +122,35 @@ END; */
 /* CREATE VIEW ClassInfo AS
 SELECT class_id, major, grade, GetClassSize(class_id) AS class_size FROM Class; */
 
+
+-- 课程管理表
+/*CREATE TABLE Courses (
+    course_id VARCHAR(20) PRIMARY KEY,
+    teacher_name VARCHAR(20),
+    course_place VARCHAR(20),
+    credits INT
+);*/
+
+-- 选课表
+/*CREATE TABLE CourseSelection (
+    student_id VARCHAR(20),
+    course_id VARCHAR(20),
+    PRIMARY KEY (student_id, course_id),
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id),
+    grade FLOAT
+);*/
+
+/* CREATE VIEW CourseInfo AS
+SELECT 
+    cs.student_id,
+    cs.course_id,
+    (SELECT teacher_name FROM Courses WHERE course_id = cs.course_id) AS teacher_name,
+    (SELECT course_place FROM Courses WHERE course_id = cs.course_id) AS course_place,
+    (SELECT credits FROM Courses WHERE course_id = cs.course_id) AS credits,
+    cs.grade
+FROM 
+    CourseSelection cs; */
+
+
+
