@@ -6,6 +6,7 @@
                     <th>班级编号</th>
                     <th>学院</th>
                     <th>年级</th>
+                    <th>人数</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -14,6 +15,7 @@
                     <td>{{ classk.class_id }}</td>
                     <td>{{ classk.major }}</td>
                     <td>{{ classk.grade }}</td>
+                    <td>{{ classk.class_size }}</td>
                     <td>
                         <button @click="navigateToEditClass(classk)">修改</button>
                         <button @click="deleteClass(classk.class_id)">删除</button>
@@ -43,6 +45,7 @@ export default {
             searchCriteria: {
                 class_id: '',
                 major: '',
+                class_size: '',
                 grade: ''
             }
         };

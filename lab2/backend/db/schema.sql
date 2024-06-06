@@ -110,3 +110,15 @@ SHOW VARIABLES LIKE 'max_allowed_packet';
     grade INT NOT NULL
 );
 INSERT INTO Class (class_id, major, grade) VALUES ('CS001', 'Computer Science', 2021); */
+
+/* 班级人数用函数计算*/
+/* CREATE FUNCTION GetClassSize(class_id VARCHAR(20)) RETURNS INT
+BEGIN
+    DECLARE class_size INT;
+    SELECT COUNT(*) INTO class_size FROM Students WHERE class = class_id;
+    RETURN class_size;
+END; */
+/*创建班级信息视图，要求包含班级编号、专业、年级、班级人数*/
+/* CREATE VIEW ClassInfo AS
+SELECT class_id, major, grade, GetClassSize(class_id) AS class_size FROM Class; */
+

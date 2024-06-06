@@ -162,7 +162,7 @@ app.delete('/api/students/:id', (req, res) => {
 
 //获取所有班级信息
 app.get('/api/classes', (req, res) => {
-  const sql = 'SELECT * FROM Class';
+  const sql = 'SELECT * FROM ClassInfo';
   db.query(sql, (err, result) => {
     if (err) {
       console.error('Database query error:', err);
