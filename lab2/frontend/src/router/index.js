@@ -8,6 +8,7 @@ import ClassForm from '../views/ClassForm.vue';
 import Course from '../views/Course.vue';
 import CourseForm from '../views/CourseForm.vue';
 import Selection from '../views/Selection.vue';
+import Grade from '../views/Grade.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -18,6 +19,7 @@ const routes = [
   { path: '/class-form', name: 'ClassForm', component: ClassForm, props: true },
   { path: '/course-form', name: 'CourseForm', component: CourseForm, props: true },
   { path: '/selection', name: 'Selection', component: Selection },
+  { path: '/grade', name: 'Grade', component: Grade }
 ];
 
 const router = createRouter({

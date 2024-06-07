@@ -75,7 +75,7 @@ app.get('/api/students', (req, res) => {
 });
 
 app.get('/api/students/search', (req, res) => {
-  const { student_id, name, gender, class: className } = req.query;
+  const { student_id, name, gender, class: className,status } = req.query;
   let sql = 'SELECT * FROM Students WHERE 1=1';
   const params = [];
 
@@ -96,6 +96,10 @@ app.get('/api/students/search', (req, res) => {
   if (className) {
     sql += ' AND class = ?';
     params.push(className);
+  }
+  if (status) {
+    sql += ' AND status = ?';
+    params.push(status);
   }
 
   db.query(sql, params, (err, results) => {
@@ -368,3 +372,46 @@ app.get('/api/selections/search', (req, res) => {
       res.json(result);
   });
 });
+
+app.get('/api/grades', (req, res) => {
+  let sql = 'SELECT * FROM CourseInfo';
+  db.query(sql, (err, result) => {
+      if (err) throw err;
+      res.json(result);
+  });
+});
+
+app.put('/api/grades', (req, res) => {
+  const { student_id, course_id, grade } = req.body;
+  let sql = 'UPDATE CourseSelection SET grade = ? WHERE student_id = ? AND course_id = ?';
+  db.query(sql, [grade, student_id, course_id], (err, result) => {
+      if (err) throw err;
+      res.send('Grade updated...');
+  });
+});
+
+app.put('/api/grades/clear', (req, res) => {
+  const { student_id, course_id } = req.body;
+  let sql = 'UPDATE CourseSelection SET grade = NULL WHERE student_id = ? AND course_id = ?';
+  db.query(sql, [student_id, course_id], (err, result) => {
+      if (err) throw err;
+      res.send('Grade cleared...');
+  });
+});
+
+app.get('/api/grades/search', (req, res) => {
+  const { student_id, student_name, course_id, credits, grade } = req.query;
+  let sql = 'SELECT * FROM CourseInfo WHERE 1=1';
+
+  if (student_id) sql += ` AND student_id = '${student_id}'`;
+  if (student_name) sql += ` AND student_name LIKE '%${student_name}%'`;
+  if (course_id) sql += ` AND course_id = '${course_id}'`;
+  if (credits) sql += ` AND credits = ${credits}`;
+  if (grade) sql += ` AND grade = ${grade}`;
+
+  db.query(sql, (err, result) => {
+      if (err) throw err;
+      res.json(result);
+  });
+});
+

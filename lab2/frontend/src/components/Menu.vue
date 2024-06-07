@@ -6,9 +6,10 @@
       <ul>
         <li><router-link to="/students">学籍信息管理</router-link></li>
         <li><router-link to="/class">班级信息管理</router-link></li>
-        <li><router-link to="/awards">奖惩信息管理</router-link></li>
         <li><router-link to="/course">课程信息管理</router-link></li>
         <li><router-link to="/selection">选课信息管理</router-link></li>
+        <li><router-link to="/grade">成绩信息管理</router-link></li>
+        <li><router-link to="/awards">奖惩信息管理</router-link></li>
       </ul>
     </nav>
   </header>

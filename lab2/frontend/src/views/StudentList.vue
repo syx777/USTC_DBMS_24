@@ -9,6 +9,7 @@
           <th>班级</th>
           <th>电话</th>
           <th>照片</th>
+          <th>学业情况</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -20,6 +21,7 @@
           <td>{{ student.class }}</td>
           <td>{{ student.phone }}</td>
           <td><button @click="showPhoto(student.photo)">查看</button></td>
+          <td>{{ student.status }}</td>
           <td>
             <button @click="navigateToEditStudent(student)">修改</button>
             <button @click="deleteStudent(student.student_id)">删除</button>
@@ -38,6 +40,7 @@
       <input type="text" v-model="searchCriteria.name" placeholder="姓名" />
       <input type="text" v-model="searchCriteria.gender" placeholder="性别" />
       <input type="text" v-model="searchCriteria.class" placeholder="班级" />
+      <input type="text" v-model="searchCriteria.status" placeholder="学业情况" />
       <button @click="searchStudents">查询</button>
     </div>
 </template>
@@ -62,7 +65,8 @@ export default {
         student_id: '',
         name: '',
         gender:'',
-        class: ''
+        class: '',
+        status: ''
       }
     };
   },

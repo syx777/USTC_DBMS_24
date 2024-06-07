@@ -130,7 +130,6 @@ SELECT class_id, major, grade, GetClassSize(class_id) AS class_size FROM Class; 
     course_place VARCHAR(20),
     credits INT
 );*/
-
 -- 选课表
 /*CREATE TABLE CourseSelection (
     student_id VARCHAR(20),
@@ -156,6 +155,95 @@ SELECT
     cs.grade
 FROM 
     CourseSelection cs; */
+/* 
+请基于以上信息继续为我创建成绩管理页面，要求如下：
+1. 初始打开界面时显示所有学生的成绩信息，包括学生ID，学生姓名，课程ID，学分，成绩，操作
+2. 支持录入成绩功能，操作栏中点击修改成绩按钮可以输入成绩或者修改成绩
+3. 支持放弃成绩功能，操作栏中点击放弃成绩按钮可以将成绩清空
+4. 支持查询功能，表格可以根据学生ID、学生姓名、课程ID、学分、成绩进行查询
+请为我输出相应的前端后端代码 */
+
+/* DELIMITER //
+
+CREATE TRIGGER update_student_status_after_insert
+AFTER INSERT ON CourseSelection
+FOR EACH ROW
+BEGIN
+    DECLARE all_passed BOOLEAN;
+
+    -- 检查该学生的所有课程成绩
+    SELECT COUNT(*) = 0
+    INTO all_passed
+    FROM CourseSelection
+    WHERE student_id = NEW.student_id
+    AND grade < 60;
+
+    -- 更新学生的状态
+    IF all_passed THEN
+        UPDATE Students
+        SET status = '合格'
+        WHERE student_id = NEW.student_id;
+    ELSE
+        UPDATE Students
+        SET status = '不合格'
+        WHERE student_id = NEW.student_id;
+    END IF;
+END //
+
+CREATE TRIGGER update_student_status_after_update
+AFTER UPDATE ON CourseSelection
+FOR EACH ROW
+BEGIN
+    DECLARE all_passed BOOLEAN;
+
+    -- 检查该学生的所有课程成绩
+    SELECT COUNT(*) = 0
+    INTO all_passed
+    FROM CourseSelection
+    WHERE student_id = NEW.student_id
+    AND (grade < 60);
+
+    -- 更新学生的状态
+    IF all_passed THEN
+        UPDATE Students
+        SET status = '合格'
+        WHERE student_id = NEW.student_id;
+    ELSE
+        UPDATE Students
+        SET status = '不合格'
+        WHERE student_id = NEW.student_id;
+    END IF;
+END //
+
+
+CREATE TRIGGER update_student_status_after_delete
+AFTER DELETE ON CourseSelection
+FOR EACH ROW
+BEGIN
+    DECLARE all_passed BOOLEAN;
+
+    -- 检查该学生的所有课程成绩
+    SELECT COUNT(*) = 0
+    INTO all_passed
+    FROM CourseSelection
+    WHERE student_id = OLD.student_id
+    AND (grade < 60);
+
+    -- 更新学生的状态
+    IF all_passed THEN
+        UPDATE Students
+        SET status = '合格'
+        WHERE student_id = OLD.student_id;
+    ELSE
+        UPDATE Students
+        SET status = '不合格'
+        WHERE student_id = OLD.student_id;
+    END IF;
+END //
+
+DELIMITER ; */
+
+
 
 
 
