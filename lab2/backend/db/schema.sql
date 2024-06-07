@@ -140,10 +140,15 @@ SELECT class_id, major, grade, GetClassSize(class_id) AS class_size FROM Class; 
     FOREIGN KEY (course_id) REFERENCES Courses(course_id),
     grade FLOAT
 );*/
+-- 插入选课信息
+/* INSERT INTO CourseSelection (student_id, course_id, grade) VALUES ('PB21111004', 'L-CS001', null);
+INSERT INTO CourseSelection (student_id, course_id, grade) VALUES ('PB21111004', 'L-CS003', 85);
+INSERT INTO CourseSelection (student_id, course_id, grade) VALUES ('PB21111013', 'L-CS001', null); */
 
 /* CREATE VIEW CourseInfo AS
 SELECT 
     cs.student_id,
+    (SELECT name from Students WHERE student_id = cs.student_id) AS student_name,
     cs.course_id,
     (SELECT teacher_name FROM Courses WHERE course_id = cs.course_id) AS teacher_name,
     (SELECT course_place FROM Courses WHERE course_id = cs.course_id) AS course_place,

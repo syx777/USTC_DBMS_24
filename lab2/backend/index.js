@@ -323,3 +323,48 @@ app.delete('/api/courses/:id', (req, res) => {
     res.json(result);
   });
 });
+
+//查询选课
+app.get('/api/selections', (req, res) => {
+  let sql = 'SELECT * FROM CourseInfo';
+  db.query(sql, (err, result) => {
+      if (err) throw err;
+      res.json(result);
+  });
+});
+
+app.post('/api/selections', (req, res) => {
+  const { student_id, course_id } = req.body;
+  let sql = 'INSERT INTO CourseSelection (student_id, course_id) VALUES (?, ?)';
+  db.query(sql, [student_id, course_id], (err, result) => {
+      if (err) throw err;
+      res.send('Course selected...');
+  });
+});
+
+app.delete('/api/selections/:student_id/:course_id', (req, res) => {
+  const { student_id, course_id } = req.params;
+  let sql = 'DELETE FROM CourseSelection WHERE student_id = ? AND course_id = ?';
+  db.query(sql, [student_id, course_id], (err, result) => {
+      if (err) throw err;
+      res.send('Course deselected...');
+  });
+});
+
+app.get('/api/selections/search', (req, res) => {
+  const { student_id, student_name, course_id, teacher_name, course_place, credits, grade } = req.query;
+  let sql = 'SELECT * FROM CourseInfo WHERE 1=1';
+
+  if (student_id) sql += ` AND student_id = '${student_id}'`;
+  if (student_name) sql += ` AND student_name LIKE '%${student_name}%'`;
+  if (course_id) sql += ` AND course_id = '${course_id}'`;
+  if (teacher_name) sql += ` AND teacher_name LIKE '%${teacher_name}%'`;
+  if (course_place) sql += ` AND course_place LIKE '%${course_place}%'`;
+  if (credits) sql += ` AND credits = ${credits}`;
+  if (grade) sql += ` AND grade = ${grade}`;
+
+  db.query(sql, (err, result) => {
+      if (err) throw err;
+      res.json(result);
+  });
+});
