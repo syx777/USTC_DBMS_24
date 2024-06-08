@@ -243,6 +243,29 @@ END //
 
 DELIMITER ; */
 
+/* drop view if EXISTS `AwardsPunishmentsInfo`;
+drop table if exists AwardsPunishments;
+
+
+CREATE TABLE AwardsPunishments (
+    record_id VARCHAR(20) PRIMARY KEY,
+    student_id VARCHAR(20),
+    type ENUM('Award', 'Punishment'),
+    description TEXT,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id)
+);
+
+CREATE VIEW AwardsPunishmentsInfo AS
+SELECT 
+    a.record_id,
+    a.student_id,
+    (SELECT name from Students WHERE student_id = a.student_id) AS student_name,
+    a.type,
+    a.description
+FROM 
+    AwardsPunishments a;  */
+
+
 
 
 

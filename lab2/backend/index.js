@@ -75,7 +75,7 @@ app.get('/api/students', (req, res) => {
 });
 
 app.get('/api/students/search', (req, res) => {
-  const { student_id, name, gender, class: className,status } = req.query;
+  const { student_id, name, gender, class: className, status } = req.query;
   let sql = 'SELECT * FROM Students WHERE 1=1';
   const params = [];
 
@@ -207,12 +207,9 @@ app.put('/api/classes/:id', (req, res) => {
 // 启动服务器并提供静态文件服务
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-const PORT = 3001;
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
+
 app.get('/api/classes/search', (req, res) => {
-  const { class_id, major, grade} = req.query;
+  const { class_id, major, grade } = req.query;
   let sql = 'SELECT * FROM Class WHERE 1=1';
   const params = [];
 
@@ -332,8 +329,8 @@ app.delete('/api/courses/:id', (req, res) => {
 app.get('/api/selections', (req, res) => {
   let sql = 'SELECT * FROM CourseInfo';
   db.query(sql, (err, result) => {
-      if (err) throw err;
-      res.json(result);
+    if (err) throw err;
+    res.json(result);
   });
 });
 
@@ -341,8 +338,8 @@ app.post('/api/selections', (req, res) => {
   const { student_id, course_id } = req.body;
   let sql = 'INSERT INTO CourseSelection (student_id, course_id) VALUES (?, ?)';
   db.query(sql, [student_id, course_id], (err, result) => {
-      if (err) throw err;
-      res.send('Course selected...');
+    if (err) throw err;
+    res.send('Course selected...');
   });
 });
 
@@ -350,8 +347,8 @@ app.delete('/api/selections/:student_id/:course_id', (req, res) => {
   const { student_id, course_id } = req.params;
   let sql = 'DELETE FROM CourseSelection WHERE student_id = ? AND course_id = ?';
   db.query(sql, [student_id, course_id], (err, result) => {
-      if (err) throw err;
-      res.send('Course deselected...');
+    if (err) throw err;
+    res.send('Course deselected...');
   });
 });
 
@@ -368,16 +365,16 @@ app.get('/api/selections/search', (req, res) => {
   if (grade) sql += ` AND grade = ${grade}`;
 
   db.query(sql, (err, result) => {
-      if (err) throw err;
-      res.json(result);
+    if (err) throw err;
+    res.json(result);
   });
 });
 
 app.get('/api/grades', (req, res) => {
   let sql = 'SELECT * FROM CourseInfo';
   db.query(sql, (err, result) => {
-      if (err) throw err;
-      res.json(result);
+    if (err) throw err;
+    res.json(result);
   });
 });
 
@@ -385,8 +382,8 @@ app.put('/api/grades', (req, res) => {
   const { student_id, course_id, grade } = req.body;
   let sql = 'UPDATE CourseSelection SET grade = ? WHERE student_id = ? AND course_id = ?';
   db.query(sql, [grade, student_id, course_id], (err, result) => {
-      if (err) throw err;
-      res.send('Grade updated...');
+    if (err) throw err;
+    res.send('Grade updated...');
   });
 });
 
@@ -394,8 +391,8 @@ app.put('/api/grades/clear', (req, res) => {
   const { student_id, course_id } = req.body;
   let sql = 'UPDATE CourseSelection SET grade = NULL WHERE student_id = ? AND course_id = ?';
   db.query(sql, [student_id, course_id], (err, result) => {
-      if (err) throw err;
-      res.send('Grade cleared...');
+    if (err) throw err;
+    res.send('Grade cleared...');
   });
 });
 
@@ -410,8 +407,78 @@ app.get('/api/grades/search', (req, res) => {
   if (grade) sql += ` AND grade = ${grade}`;
 
   db.query(sql, (err, result) => {
-      if (err) throw err;
-      res.json(result);
+    if (err) throw err;
+    res.json(result);
   });
+});
+
+app.get('/api/awards', (req, res) => {
+  const sql = 'SELECT * FROM AwardsPunishmentsInfo';
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Database query error:', err);
+      throw err;
+    }
+    res.json(result);
+  });
+});
+
+
+app.put('/api/awards/:id', (req, res) => {
+  const updatedAward = req.body;
+  const sql = 'UPDATE AwardsPunishments SET student_id = ?, type = ?, description = ? WHERE record_id = ?';
+  db.query(sql, [updatedAward.student_id, updatedAward.type, updatedAward.description, req.params.id], (err, result) => {
+    if (err) {
+      console.error('Error updating award:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(result);
+  });
+});
+
+app.delete('/api/awards/:id', (req, res) => {
+  const sql = 'DELETE FROM AwardsPunishments WHERE record_id = ?';
+  db.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      console.error('Error deleting award:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(result);
+  });
+});
+app.get('/api/awards/search', (req, res) => {
+  const { record_id, student_id, student_name, type, description } = req.query;
+  let sql = 'SELECT * FROM AwardsPunishmentsInfo WHERE 1=1';
+
+  if (record_id) sql += ` AND record_id = '${record_id}'`;
+  if (student_id) sql += ` AND student_id = '${student_id}'`;
+  if (student_name) sql += ` AND student_name LIKE '%${student_name}%'`;
+  if (type) sql += ` AND type = ${type}`;
+  if (description) sql += ` AND description LIKE '%${description}%'`;
+
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
+
+app.post('/api/awards', (req, res) => {
+  const newAward=req.body;
+  const sql = 'INSERT INTO AwardsPunishments (record_id, student_id, type, description) VALUES (?, ?, ?, ?)';
+  db.query(sql, [newAward.record_id, newAward.student_id, newAward.type, newAward.description], (err, result) => {
+    if (err) {
+      console.error('Error inserting award:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.status(201).json({ id: result.insertId, ...newAward });
+  });
+});
+
+const PORT = 3001;
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
 
