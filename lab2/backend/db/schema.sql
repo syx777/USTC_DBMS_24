@@ -1,6 +1,6 @@
 /* SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE IF NOT EXISTS SchoolManagementSystem;*/
-USE SchoolManagementSystem;
+-- USE SchoolManagementSystem;
 
 /*drop table if exists MajorChanges;
 drop table if exists AwardsPunishments;
@@ -21,58 +21,7 @@ CREATE TABLE Students (
     photo BLOB
 );
 
-SHOW VARIABLES LIKE 'secure_file_priv';
-SELECT LOAD_FILE('/var/lib/mysql-files/exp1.jpg');
-
-
--- 专业变更表
-CREATE TABLE MajorChanges (
-    change_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20),
-    old_major VARCHAR(100),
-    new_major VARCHAR(100),
-    change_date DATE,
-    FOREIGN KEY (student_id) REFERENCES Students(student_id)
-);
-
--- 奖惩情况表
-CREATE TABLE AwardsPunishments (
-    record_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20),
-    type ENUM('Award', 'Punishment'),
-    description TEXT,
-    date DATE,
-    FOREIGN KEY (student_id) REFERENCES Students(student_id)
-);
-
--- 课程管理表
-CREATE TABLE Courses (
-    course_id INT AUTO_INCREMENT PRIMARY KEY,
-    course_name VARCHAR(100),
-    credits INT,
-    instructor VARCHAR(100)
-);
-
--- 课程成绩表
-CREATE TABLE CourseGrades (
-    grade_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20),
-    course_id INT,
-    grade DECIMAL(5,2),
-    FOREIGN KEY (student_id) REFERENCES Students(student_id),
-    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
-);
-
--- 文件管理表
-CREATE TABLE Files (
-    file_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20),
-    file_name VARCHAR(255),
-    file_type VARCHAR(50),
-    file_content LONGBLOB,
-    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES Students(student_id)
-);
+//存储过程：添加学生
 
 
 CREATE PROCEDURE AddStudent(
@@ -88,18 +37,6 @@ BEGIN
     VALUES (student_id,name, gender, class,phone,photo);
 END
 ;
-Call AddStudent('PB21111001','Tom', 'M', 'CS001','19337353643',LOAD_FILE('/var/lib/mysql-files/exp1.jpg'));
-Call AddStudent('PB21111002','Jerry', 'F', 'Ma002','18934372238',LOAD_FILE('/var/lib/mysql-files/exp2.jpg'));
-Call AddStudent('PB21111003','Alice', 'F',  'CS003','18137649812',null);
-Call AddStudent('PB21111004','Bob', 'M', 'CS001','13782648987',null);
-
-
-DROP PROCEDURE IF EXISTS AddStudent;
-DESCRIBE Students;
-ALTER TABLE Students MODIFY photo LONGBLOB;
-ALTER PROCEDURE `AddStudent` MODIFY photo LONGBLOB;
-
-*/
 
 /* 班级信息表 */
 /* CREATE TABLE Class (
@@ -107,7 +44,6 @@ ALTER PROCEDURE `AddStudent` MODIFY photo LONGBLOB;
     major VARCHAR(50) NOT NULL,
     grade INT NOT NULL
 );
-INSERT INTO Class (class_id, major, grade) VALUES ('CS001', 'Computer Science', 2021); */
 
 /* 班级人数用函数计算*/
 /* CREATE FUNCTION GetClassSize(class_id VARCHAR(20)) RETURNS INT
@@ -120,6 +56,46 @@ END; */
 /* CREATE VIEW ClassInfo AS
 SELECT class_id, major, grade, GetClassSize(class_id) AS class_size FROM Class; */
 
+
+/* DELIMITER $$
+
+CREATE PROCEDURE AddOrUpdateStudent(
+    IN p_student_id VARCHAR(10),
+    IN p_name VARCHAR(100),
+    IN p_gender ENUM('M', 'F'),
+    IN p_class VARCHAR(20),
+    IN p_phone VARCHAR(20),
+    IN p_photo BLOB,
+    IN p_is_new BOOLEAN
+)
+BEGIN
+    DECLARE class_size INT;
+
+    -- 开始事务
+    START TRANSACTION;
+
+    -- 如果是新学生
+    IF p_is_new THEN
+        INSERT INTO Students (student_id, name, gender, class, phone, photo)
+        VALUES (p_student_id, p_name, p_gender, p_class, p_phone, p_photo);
+    ELSE
+        UPDATE Students
+        SET name = p_name, gender = p_gender, class = p_class, phone = p_phone, photo = p_photo
+        WHERE student_id = p_student_id;
+    END IF;
+
+    -- 计算班级人数
+    SET class_size = GetClassSize(p_class);
+
+    -- 如果班级人数超过2，回滚事务并退出
+    IF class_size > 2 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '班级人数超过2，操作失败';
+    ELSE
+        -- 提交事务
+        COMMIT;
+    END IF;
+END$$
 
 -- 课程管理表
 /*CREATE TABLE Courses (
@@ -137,10 +113,7 @@ SELECT class_id, major, grade, GetClassSize(class_id) AS class_size FROM Class; 
     FOREIGN KEY (course_id) REFERENCES Courses(course_id),
     grade FLOAT
 );*/
--- 插入选课信息
-/* INSERT INTO CourseSelection (student_id, course_id, grade) VALUES ('PB21111004', 'L-CS001', null);
-INSERT INTO CourseSelection (student_id, course_id, grade) VALUES ('PB21111004', 'L-CS003', 85);
-INSERT INTO CourseSelection (student_id, course_id, grade) VALUES ('PB21111013', 'L-CS001', null); */
+
 
 /* CREATE VIEW CourseInfo AS
 SELECT 
@@ -153,15 +126,8 @@ SELECT
     cs.grade
 FROM 
     CourseSelection cs; */
-/* 
-请基于以上信息继续为我创建成绩管理页面，要求如下：
-1. 初始打开界面时显示所有学生的成绩信息，包括学生ID，学生姓名，课程ID，学分，成绩，操作
-2. 支持录入成绩功能，操作栏中点击修改成绩按钮可以输入成绩或者修改成绩
-3. 支持放弃成绩功能，操作栏中点击放弃成绩按钮可以将成绩清空
-4. 支持查询功能，表格可以根据学生ID、学生姓名、课程ID、学分、成绩进行查询
-请为我输出相应的前端后端代码 */
 
-/* DELIMITER //
+/*DELIMITER //
 
 CREATE TRIGGER update_student_status_after_insert
 AFTER INSERT ON CourseSelection
@@ -241,11 +207,8 @@ END //
 
 DELIMITER ; */
 
-/* drop view if EXISTS `AwardsPunishmentsInfo`;
-drop table if exists AwardsPunishments;
-
-
-CREATE TABLE AwardsPunishments (
+-- 奖惩情况表
+/* CREATE TABLE AwardsPunishments (
     record_id VARCHAR(20) PRIMARY KEY,
     student_id VARCHAR(20),
     type ENUM('Award', 'Punishment'),
@@ -261,51 +224,11 @@ SELECT
     a.type,
     a.description
 FROM 
-    AwardsPunishments a;  */
+    AwardsPunishments a; */
 
-/* DELIMITER $$
 
-CREATE PROCEDURE AddOrUpdateStudent(
-    IN p_student_id VARCHAR(10),
-    IN p_name VARCHAR(100),
-    IN p_gender ENUM('M', 'F'),
-    IN p_class VARCHAR(20),
-    IN p_phone VARCHAR(20),
-    IN p_photo BLOB,
-    IN p_is_new BOOLEAN
-)
-BEGIN
-    DECLARE class_size INT;
 
-    -- 开始事务
-    START TRANSACTION;
-
-    -- 如果是新学生
-    IF p_is_new THEN
-        -- 将新学生插入到 Students 表中
-        INSERT INTO Students (student_id, name, gender, class, phone, photo)
-        VALUES (p_student_id, p_name, p_gender, p_class, p_phone, p_photo);
-    ELSE
-        -- 修改现有学生的班级
-        UPDATE Students
-        SET name = p_name, gender = p_gender, class = p_class, phone = p_phone, photo = p_photo
-        WHERE student_id = p_student_id;
-    END IF;
-
-    -- 计算班级人数
-    SELECT COUNT(*) INTO class_size FROM Students WHERE class = p_class;
-
-    -- 如果班级人数超过2，回滚事务并退出
-    IF class_size > 2 THEN
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '班级人数超过2，操作失败';
-    ELSE
-        -- 提交事务
-        COMMIT;
-    END IF;
-END$$
-
-DELIMITER ; */
+-- DELIMITER ; 
 
 /* ALTER TABLE Students
 ADD FOREIGN KEY (class) REFERENCES Class(class_id);  */
@@ -314,6 +237,10 @@ ADD FOREIGN KEY (class) REFERENCES Class(class_id);  */
 SELECT Students.*, Class.major, Class.grade
 FROM Students
 JOIN Class ON Students.class = Class.class_id; */
+
+
+/* ALTER TABLE Students
+ALTER COLUMN status SET DEFAULT '合格'; */
 
 
 

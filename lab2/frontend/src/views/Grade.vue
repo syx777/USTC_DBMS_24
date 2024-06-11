@@ -25,6 +25,7 @@
                 </tr>
             </tbody>
         </table>
+        <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
         <div class="search-bar">
             <input type="text" v-model="searchCriteria.student_id" placeholder="学生ID" />
             <input type="text" v-model="searchCriteria.student_name" placeholder="学生姓名" />
@@ -46,9 +47,13 @@
 
 <script>
 import axios from 'axios';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'GradeManagement',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             grades: [],
@@ -77,7 +82,7 @@ export default {
                     this.grades = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         searchGrades() {
@@ -86,7 +91,7 @@ export default {
                     this.grades = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         editGrade(grade) {
@@ -100,7 +105,7 @@ export default {
                     this.isEditing = false;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         clearGrade(student_id, course_id) {
@@ -109,12 +114,20 @@ export default {
                     this.fetchGrades();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         cancelEdit() {
             this.isEditing = false;
             this.editForm = { student_id: '', course_id: '', grade: '' };
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.error;
+            } else {
+                this.errorMessage = 'An error occurred';
+            }
         }
     }
 };

@@ -24,6 +24,7 @@
             </tbody>
         </table>
         <button class="add-class-button" @click="navigateToAddClass">添加班级</button>
+        <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
     </div>
     <div class="search-bar">
         <input type="text" v-model="searchCriteria.class_id" placeholder="班级编号" />
@@ -36,9 +37,13 @@
 <script>
 import axios from 'axios';
 import router from '../router';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'ClassList',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             classes: [],
@@ -60,7 +65,7 @@ export default {
                     this.classes = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         searchClasses() {
@@ -69,7 +74,7 @@ export default {
                     this.classes = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         navigateToAddClass() {
@@ -84,9 +89,17 @@ export default {
                     this.fetchClasses();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
-        }
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.error;
+            } else {
+                this.errorMessage = 'An error occurred';
+            }
+        },
     }
 };
 </script>
@@ -97,12 +110,12 @@ export default {
 }
 
 .search-bar {
-  margin-bottom: 20px;
-  margin-left: 250px;
+    margin-bottom: 20px;
+    margin-left: 250px;
 }
 
 .search-bar input {
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
 .add-class-button {

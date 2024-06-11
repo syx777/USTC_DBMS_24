@@ -33,6 +33,7 @@
             <input type="text" v-model="newSelection.course_id" placeholder="课程ID" />
             <button @click="addSelection">选课</button>
         </div>
+        <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
         <div class="search-bar">
             <input type="text" v-model="searchCriteria.student_id" placeholder="学生ID" />
             <input type="text" v-model="searchCriteria.student_name" placeholder="学生姓名" />
@@ -48,9 +49,13 @@
 
 <script>
 import axios from 'axios';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'CourseSelection',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             selections: [],
@@ -79,7 +84,7 @@ export default {
                     this.selections = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         addSelection() {
@@ -88,7 +93,7 @@ export default {
                     this.fetchSelections();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         deleteSelection(student_id, course_id) {
@@ -97,7 +102,7 @@ export default {
                     this.fetchSelections();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         searchSelections() {
@@ -106,8 +111,16 @@ export default {
                     this.selections = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.error;
+            } else {
+                this.errorMessage = 'An error occurred';
+            }
         }
     }
 };

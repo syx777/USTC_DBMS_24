@@ -27,6 +27,7 @@
         </table>
         <button class="add-award-button" @click="navigateToAddAward">添加记录</button>
     </div>
+    <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
     <div class="search-bar">
         <input type="text" v-model="searchCriteria.record_id" placeholder="记录编号" />
         <input type="text" v-model="searchCriteria.student_id" placeholder="学生编号" />
@@ -40,9 +41,13 @@
 <script>
 import axios from 'axios';
 import router from '../router';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'AwardList',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             awards: [],
@@ -66,7 +71,7 @@ export default {
                     this.awards = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         searchAwards() {
@@ -75,7 +80,7 @@ export default {
                     this.awards = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         navigateToAddAward() {
@@ -90,8 +95,16 @@ export default {
                     this.fetchAwards();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.message;
+            } else {
+                this.errorMessage = 'An error occurred';
+            }
         }
     }
 };

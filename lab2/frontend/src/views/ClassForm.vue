@@ -22,15 +22,20 @@
                 <button @click="returnClassList">返回</button>
             </div>
         </form>
+        <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import router from '../router';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'ClassForm',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             form: {
@@ -48,7 +53,7 @@ export default {
                 this.form.major = this.classk.major || '';
                 this.form.grade = this.classk.grade || '';
             } catch (error) {
-                console.error('Error parsing classk:', error);
+                console.handleError('Error parsing classk:', error);
             }
         } else {
             console.log('No classk found');
@@ -68,7 +73,7 @@ export default {
                         router.push({ name: 'Class' });
                     })
                     .catch(error => {
-                        console.error(error);
+                        console.handleError(error);
                     });
             } else {
                 axios.post('http://localhost:3001/api/classes', this.form)
@@ -76,10 +81,18 @@ export default {
                         router.push({ name: 'Class' });
                     })
                     .catch(error => {
-                        console.error(error);
+                        console.handleError(error);
                     });
             }
-        }
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.error;
+            } else {
+                this.errorMessage = 'An error occurred';
+            }
+        },
     }
 };
 </script>

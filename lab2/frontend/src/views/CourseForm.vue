@@ -26,15 +26,20 @@
                 <button @click="returnCourseList">返回</button>
             </div>
         </form>
+        <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import router from '../router';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'CourseForm',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             form: {
@@ -52,9 +57,9 @@ export default {
                 this.form.course_id = this.course.course_id || '';
                 this.form.teacher_name = this.course.teacher_name || '';
                 this.form.course_place = this.course.course_place || '';
-                this.form.credits= this.course.credits || '';
+                this.form.credits = this.course.credits || '';
             } catch (error) {
-                console.error('Error parsing course:', error);
+                console.handleError(error);
             }
         } else {
             console.log('No course found');
@@ -74,7 +79,7 @@ export default {
                         router.push({ name: 'Course' });
                     })
                     .catch(error => {
-                        console.error(error);
+                        console.handleError(error);
                     });
             } else {
                 axios.post('http://localhost:3001/api/courses', this.form)
@@ -82,10 +87,18 @@ export default {
                         router.push({ name: 'Course' });
                     })
                     .catch(error => {
-                        console.error(error);
+                        console.handleError(error);
                     });
             }
-        }
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.error;
+            } else {
+                this.errorMessage = 'An error occurred';
+            }
+        },
     }
 };
 </script>

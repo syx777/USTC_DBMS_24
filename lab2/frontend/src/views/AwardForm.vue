@@ -26,15 +26,20 @@
                 <button @click="returnAwardList">返回</button>
             </div>
         </form>
+        <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import router from '../router';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'AwardForm',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             form: {
@@ -54,7 +59,7 @@ export default {
                 this.form.type = this.award.type || '';
                 this.form.description = this.award.description || '';
             } catch (error) {
-                console.error('Error parsing award:', error);
+                console.handleError('Error parsing award:', error);
             }
         } else {
             console.log('No award found');
@@ -74,7 +79,7 @@ export default {
                         router.push({ name: 'Award' });
                     })
                     .catch(error => {
-                        console.error(error);
+                        console.handleError(error);
                     });
             } else {
                 console.log('Adding award:', this.form)
@@ -84,10 +89,18 @@ export default {
                         router.push({ name: 'Award' });
                     })
                     .catch(error => {
-                        console.error(error);
+                        console.handleError(error);
                     });
             }
-        }
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.error;
+            } else {
+                this.errorMessage = 'An error occurred';
+            }
+        },
     }
 };
 </script>

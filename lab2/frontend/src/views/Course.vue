@@ -24,6 +24,7 @@
             </tbody>
         </table>
         <button class="add-course-button" @click="navigateToAddCourse">添加课程</button>
+        <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
     </div>
      <div class="search-bar">
         <input type="text" v-model="searchCriteria.course_id" placeholder="课程ID" />
@@ -37,9 +38,13 @@
 <script>
 import axios from 'axios';
 import router from '../router';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
     name: 'CourseList',
+    components: {
+        ErrorNotification
+    },
     data() {
         return {
             courses: [],
@@ -62,7 +67,7 @@ export default {
                     this.courses = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         searchCourses() {
@@ -71,7 +76,7 @@ export default {
                     this.courses = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleError(error);
                 });
         },
         navigateToAddCourse() {
@@ -86,8 +91,16 @@ export default {
                     this.fetchCourses();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.handleErrorr(error);
                 });
+        },
+        handleError(error) {
+            console.error(error);
+            if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.message;
+            } else {
+                this.errorMessage = error.message;
+            }
         }
     }
 };
