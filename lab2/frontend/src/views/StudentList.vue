@@ -7,6 +7,8 @@
           <th>姓名</th>
           <th>性别</th>
           <th>班级</th>
+          <th>专业</th>
+          <th>预计毕业时间</th>
           <th>电话</th>
           <th>照片</th>
           <th>学业情况</th>
@@ -19,6 +21,8 @@
           <td>{{ student.name }}</td>
           <td>{{ student.gender }}</td>
           <td>{{ student.class }}</td>
+          <td>{{ student.major }}</td>
+          <td>{{ student.grade }}</td>
           <td>{{ student.phone }}</td>
           <td><button @click="showPhoto(student.photo)">查看</button></td>
           <td>{{ student.status }}</td>
@@ -34,27 +38,32 @@
     <modal v-if="showPhotoModal" @close="showPhotoModal = false">
       <img :src="currentPhoto" alt="Student Photo" />
     </modal>
+
+    <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
   </div>
   <div class="search-bar">
-      <input type="text" v-model="searchCriteria.student_id" placeholder="学号" />
-      <input type="text" v-model="searchCriteria.name" placeholder="姓名" />
-      <input type="text" v-model="searchCriteria.gender" placeholder="性别" />
-      <input type="text" v-model="searchCriteria.class" placeholder="班级" />
-      <input type="text" v-model="searchCriteria.status" placeholder="学业情况" />
-      <button @click="searchStudents">查询</button>
-    </div>
+    <input type="text" v-model="searchCriteria.student_id" placeholder="学号" />
+    <input type="text" v-model="searchCriteria.name" placeholder="姓名" />
+    <input type="text" v-model="searchCriteria.gender" placeholder="性别" />
+    <input type="text" v-model="searchCriteria.class" placeholder="班级" />
+    <input type="text" v-model="searchCriteria.major" placeholder="专业" />
+    <input type="text" v-model="searchCriteria.grade" placeholder="预计毕业时间" />
+    <input type="text" v-model="searchCriteria.status" placeholder="学业情况" />
+    <button @click="searchStudents">查询</button>
+  </div>
 </template>
-
 
 <script>
 import axios from 'axios';
 import Modal from '../components/Modal.vue';
+import ErrorNotification from '../components/Error.vue';
 import router from '../router';
 
 export default {
   name: 'StudentList',
   components: {
     Modal,
+    ErrorNotification,
   },
   data() {
     return {
@@ -64,10 +73,13 @@ export default {
       searchCriteria: {
         student_id: '',
         name: '',
-        gender:'',
+        gender: '',
         class: '',
-        status: ''
-      }
+        major: '',
+        grade: '',
+        status: '',
+      },
+      errorMessage: '',
     };
   },
   created() {
@@ -80,7 +92,7 @@ export default {
           this.students = response.data;
         })
         .catch(error => {
-          console.error(error);
+          this.handleError(error);
         });
     },
     searchStudents() {
@@ -89,7 +101,7 @@ export default {
           this.students = response.data;
         })
         .catch(error => {
-          console.error(error);
+          this.handleError(error);
         });
     },
     showPhoto(photo) {
@@ -109,13 +121,20 @@ export default {
           this.fetchStudents();
         })
         .catch(error => {
-          console.error(error);
+          this.handleError(error);
         });
-    }
-  }
+    },
+    handleError(error) {
+      console.error(error);
+      if (error.response && error.response.data) {
+        this.errorMessage = error.response.data.error;
+      } else {
+        this.errorMessage = 'An error occurred';
+      }
+    },
+  },
 };
 </script>
-
 
 <style scoped>
 .students {
@@ -160,4 +179,3 @@ button {
   max-width: 100%;
 }
 </style>
-

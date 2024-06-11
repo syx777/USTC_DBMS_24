@@ -41,15 +41,21 @@
     <div v-if="showPhotoModal" class="modal" @click="closePhotoModal">
       <img :src="form.photoUrl" alt="Student Photo" />
     </div>
+
+    <error-notification v-if="errorMessage" :message="errorMessage" @close="errorMessage = ''" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import router from '../router';
+import ErrorNotification from '../components/Error.vue';
 
 export default {
   name: 'StudentForm',
+  components: {
+    ErrorNotification,
+  },
   data() {
     return {
       form: {
@@ -59,9 +65,10 @@ export default {
         class: '',
         phone: '',
         photo: null,
-        photoUrl: null
+        photoUrl: null,
       },
-      showPhotoModal: false
+      showPhotoModal: false,
+      errorMessage: '',
     };
   },
   created() {
@@ -118,31 +125,39 @@ export default {
         // 编辑学生
         axios.put(`http://localhost:3001/api/students/${studentId}`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         })
           .then(() => {
             router.push({ name: 'StudentList' });
           })
           .catch(error => {
-            console.error(error);
+            this.handleError(error);
           });
       } else {
         // 添加学生
         axios.post('http://localhost:3001/api/students', formData, {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         })
           .then(() => {
             router.push({ name: 'StudentList' });
           })
           .catch(error => {
-            console.error(error);
+            this.handleError(error);
           });
       }
-    }
-  }
+    },
+    handleError(error) {
+      console.error(error);
+      if (error.response && error.response.data) {
+        this.errorMessage = error.response.data.error;
+      } else {
+        this.errorMessage = 'An error occurred';
+      }
+    },
+  },
 };
 </script>
 

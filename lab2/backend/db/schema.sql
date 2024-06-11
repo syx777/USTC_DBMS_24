@@ -94,12 +94,10 @@ Call AddStudent('PB21111003','Alice', 'F',  'CS003','18137649812',null);
 Call AddStudent('PB21111004','Bob', 'M', 'CS001','13782648987',null);
 
 
-SHOW VARIABLES LIKE 'max_allowed_packet';
 DROP PROCEDURE IF EXISTS AddStudent;
 DESCRIBE Students;
 ALTER TABLE Students MODIFY photo LONGBLOB;
 ALTER PROCEDURE `AddStudent` MODIFY photo LONGBLOB;
-SHOW VARIABLES LIKE 'max_allowed_packet';
 
 */
 
@@ -265,6 +263,57 @@ SELECT
 FROM 
     AwardsPunishments a;  */
 
+/* DELIMITER $$
+
+CREATE PROCEDURE AddOrUpdateStudent(
+    IN p_student_id VARCHAR(10),
+    IN p_name VARCHAR(100),
+    IN p_gender ENUM('M', 'F'),
+    IN p_class VARCHAR(20),
+    IN p_phone VARCHAR(20),
+    IN p_photo BLOB,
+    IN p_is_new BOOLEAN
+)
+BEGIN
+    DECLARE class_size INT;
+
+    -- 开始事务
+    START TRANSACTION;
+
+    -- 如果是新学生
+    IF p_is_new THEN
+        -- 将新学生插入到 Students 表中
+        INSERT INTO Students (student_id, name, gender, class, phone, photo)
+        VALUES (p_student_id, p_name, p_gender, p_class, p_phone, p_photo);
+    ELSE
+        -- 修改现有学生的班级
+        UPDATE Students
+        SET name = p_name, gender = p_gender, class = p_class, phone = p_phone, photo = p_photo
+        WHERE student_id = p_student_id;
+    END IF;
+
+    -- 计算班级人数
+    SELECT COUNT(*) INTO class_size FROM Students WHERE class = p_class;
+
+    -- 如果班级人数超过2，回滚事务并退出
+    IF class_size > 2 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '班级人数超过2，操作失败';
+    ELSE
+        -- 提交事务
+        COMMIT;
+    END IF;
+END$$
+
+DELIMITER ; */
+
+/* ALTER TABLE Students
+ADD FOREIGN KEY (class) REFERENCES Class(class_id);  */
+
+/* CREATE VIEW StudentView AS
+SELECT Students.*, Class.major, Class.grade
+FROM Students
+JOIN Class ON Students.class = Class.class_id; */
 
 
 

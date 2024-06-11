@@ -56,7 +56,7 @@ if (!fs.existsSync(uploadDir)) {
 
 // 获取所有学生信息
 app.get('/api/students', (req, res) => {
-  const sql = 'SELECT * FROM Students';
+  const sql = 'SELECT * FROM StudentView';
   db.query(sql, (err, results) => {
     if (err) {
       console.error('Database query error:', err);
@@ -75,8 +75,8 @@ app.get('/api/students', (req, res) => {
 });
 
 app.get('/api/students/search', (req, res) => {
-  const { student_id, name, gender, class: className, status } = req.query;
-  let sql = 'SELECT * FROM Students WHERE 1=1';
+  const { student_id, name, gender, class: className, major,grade,status } = req.query;
+  let sql = 'SELECT * FROM StudentView WHERE 1=1';
   const params = [];
 
   if (student_id) {
@@ -96,6 +96,14 @@ app.get('/api/students/search', (req, res) => {
   if (className) {
     sql += ' AND class = ?';
     params.push(className);
+  }
+  if(major){
+    sql += ' AND major = ?';
+    params.push(major);
+  }
+  if(grade){
+    sql += ' AND grade = ?';
+    params.push(grade);
   }
   if (status) {
     sql += ' AND status = ?';
@@ -119,13 +127,12 @@ app.get('/api/students/search', (req, res) => {
   });
 });
 
-// 添加学生
 app.post('/api/students', upload.single('photo'), (req, res) => {
   const newStudent = req.body;
   const photoPath = req.file ? req.file.path : null;
 
-  const sql = 'CALL AddStudent (?, ?, ?, ?, ?, ?)';
-  db.query(sql, [newStudent.student_id, newStudent.name, newStudent.gender, newStudent.class, newStudent.phone, photoPath], (err, result) => {
+  const sql = 'CALL AddOrUpdateStudent (?, ?, ?, ?, ?, ?, ?)';
+  db.query(sql, [newStudent.student_id, newStudent.name, newStudent.gender, newStudent.class, newStudent.phone, photoPath, true], (err, result) => {
     if (err) {
       console.error('Error inserting student:', err);
       res.status(500).json({ error: err.message });
@@ -135,13 +142,12 @@ app.post('/api/students', upload.single('photo'), (req, res) => {
   });
 });
 
-// 更新学生信息
 app.put('/api/students/:id', upload.single('photo'), (req, res) => {
   const updatedStudent = req.body;
   const photoPath = req.file ? req.file.path : null;
 
-  const sql = 'UPDATE Students SET name = ?, gender = ?, class = ?, phone = ?, photo = ? WHERE student_id = ?';
-  db.query(sql, [updatedStudent.name, updatedStudent.gender, updatedStudent.class, updatedStudent.phone, photoPath, req.params.id], (err, result) => {
+  const sql = 'CALL AddOrUpdateStudent (?, ?, ?, ?, ?, ?, ?)';
+  db.query(sql, [req.params.id, updatedStudent.name, updatedStudent.gender, updatedStudent.class, updatedStudent.phone, photoPath, false], (err, result) => {
     if (err) {
       console.error('Error updating student:', err);
       res.status(500).json({ error: err.message });
