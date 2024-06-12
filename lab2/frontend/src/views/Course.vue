@@ -67,7 +67,7 @@ export default {
                     this.courses = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         searchCourses() {
@@ -76,7 +76,7 @@ export default {
                     this.courses = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         navigateToAddCourse() {
@@ -91,7 +91,7 @@ export default {
                     this.fetchCourses();
                 })
                 .catch(error => {
-                    console.handleErrorr(error);
+                    this.handleError(error);
                 });
         },
         handleError(error) {

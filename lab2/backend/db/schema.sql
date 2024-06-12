@@ -2,7 +2,7 @@
 CREATE DATABASE IF NOT EXISTS SchoolManagementSystem;*/
 -- USE SchoolManagementSystem;
 
-/*drop table if exists MajorChanges;
+/*
 drop table if exists AwardsPunishments;
 drop table if exists CourseGrades;
 drop table if exists Class;
@@ -21,7 +21,9 @@ CREATE TABLE Students (
     photo BLOB
 );
 
+
 //存储过程：添加学生
+
 
 
 CREATE PROCEDURE AddStudent(
@@ -41,8 +43,7 @@ END
 /* 班级信息表 */
 /* CREATE TABLE Class (
     class_id VARCHAR(20) PRIMARY KEY NOT NULL,
-    major VARCHAR(50) NOT NULL,
-    grade INT NOT NULL
+    graduate INT NOT NULL
 );
 
 /* 班级人数用函数计算*/
@@ -52,9 +53,9 @@ BEGIN
     SELECT COUNT(*) INTO class_size FROM Students WHERE class = class_id;
     RETURN class_size;
 END; */
-/*创建班级信息视图，要求包含班级编号、专业、年级、班级人数*/
+/*创建班级信息视图，包含班级编号、专业、班级人数*/
 /* CREATE VIEW ClassInfo AS
-SELECT class_id, major, grade, GetClassSize(class_id) AS class_size FROM Class; */
+SELECT class_id, graduate, GetClassSize(class_id) AS class_size FROM Class; */
 
 
 /* DELIMITER $$
@@ -233,14 +234,18 @@ FROM
 /* ALTER TABLE Students
 ADD FOREIGN KEY (class) REFERENCES Class(class_id);  */
 
+
 /* CREATE VIEW StudentView AS
-SELECT Students.*, Class.major, Class.grade
+SELECT Students.*, Class.graduate
 FROM Students
 JOIN Class ON Students.class = Class.class_id; */
 
 
 /* ALTER TABLE Students
 ALTER COLUMN status SET DEFAULT '合格'; */
+
+
+
 
 
 

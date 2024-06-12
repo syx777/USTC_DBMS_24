@@ -7,7 +7,6 @@
           <th>姓名</th>
           <th>性别</th>
           <th>班级</th>
-          <th>专业</th>
           <th>预计毕业时间</th>
           <th>电话</th>
           <th>照片</th>
@@ -21,7 +20,6 @@
           <td>{{ student.name }}</td>
           <td>{{ student.gender }}</td>
           <td>{{ student.class }}</td>
-          <td>{{ student.major }}</td>
           <td>{{ student.grade }}</td>
           <td>{{ student.phone }}</td>
           <td><button @click="showPhoto(student.photo)">查看</button></td>
@@ -46,7 +44,6 @@
     <input type="text" v-model="searchCriteria.name" placeholder="姓名" />
     <input type="text" v-model="searchCriteria.gender" placeholder="性别" />
     <input type="text" v-model="searchCriteria.class" placeholder="班级" />
-    <input type="text" v-model="searchCriteria.major" placeholder="专业" />
     <input type="text" v-model="searchCriteria.grade" placeholder="预计毕业时间" />
     <input type="text" v-model="searchCriteria.status" placeholder="学业情况" />
     <button @click="searchStudents">查询</button>
@@ -75,7 +72,6 @@ export default {
         name: '',
         gender: '',
         class: '',
-        major: '',
         grade: '',
         status: '',
       },

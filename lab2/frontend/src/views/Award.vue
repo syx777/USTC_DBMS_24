@@ -71,7 +71,7 @@ export default {
                     this.awards = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         searchAwards() {
@@ -80,7 +80,7 @@ export default {
                     this.awards = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         navigateToAddAward() {
@@ -95,7 +95,7 @@ export default {
                     this.fetchAwards();
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         handleError(error) {

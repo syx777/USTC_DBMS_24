@@ -84,7 +84,7 @@ export default {
                     this.selections = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         addSelection() {
@@ -93,7 +93,7 @@ export default {
                     this.fetchSelections();
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         deleteSelection(student_id, course_id) {
@@ -102,7 +102,7 @@ export default {
                     this.fetchSelections();
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         searchSelections() {
@@ -111,7 +111,7 @@ export default {
                     this.selections = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         handleError(error) {

@@ -4,7 +4,6 @@
             <thead>
                 <tr>
                     <th>班级编号</th>
-                    <th>学院</th>
                     <th>年级</th>
                     <th>人数</th>
                     <th>操作</th>
@@ -13,7 +12,6 @@
             <tbody>
                 <tr v-for="classk in classes" :key="classk.class_id">
                     <td>{{ classk.class_id }}</td>
-                    <td>{{ classk.major }}</td>
                     <td>{{ classk.grade }}</td>
                     <td>{{ classk.class_size }}</td>
                     <td>
@@ -28,7 +26,6 @@
     </div>
     <div class="search-bar">
         <input type="text" v-model="searchCriteria.class_id" placeholder="班级编号" />
-        <input type="text" v-model="searchCriteria.major" placeholder="学院" />
         <input type="text" v-model="searchCriteria.grade" placeholder="年级" />
         <button @click="searchClasses">查询</button>
     </div>
@@ -49,7 +46,6 @@ export default {
             classes: [],
             searchCriteria: {
                 class_id: '',
-                major: '',
                 class_size: '',
                 grade: ''
             }
@@ -65,7 +61,7 @@ export default {
                     this.classes = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         searchClasses() {
@@ -74,7 +70,7 @@ export default {
                     this.classes = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         navigateToAddClass() {
@@ -89,7 +85,7 @@ export default {
                     this.fetchClasses();
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         handleError(error) {

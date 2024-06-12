@@ -8,10 +8,6 @@
                         <td><input v-model="form.class_id" id="class_id" type="text" required /></td>
                     </tr>
                     <tr>
-                        <td><label for="major">学院</label></td>
-                        <td><input v-model="form.major" id="major" type="text" required /></td>
-                    </tr>
-                    <tr>
                         <td><label for="grade">年级</label></td>
                         <td><input v-model="form.grade" id="grade" type="text" required /></td>
                     </tr>
@@ -40,7 +36,6 @@ export default {
         return {
             form: {
                 class_id: '',
-                major: '',
                 grade: ''
             },
         };
@@ -50,10 +45,9 @@ export default {
             try {
                 this.classk = JSON.parse(this.$route.params.classk);
                 this.form.class_id = this.classk.class_id || '';
-                this.form.major = this.classk.major || '';
                 this.form.grade = this.classk.grade || '';
             } catch (error) {
-                console.handleError('Error parsing classk:', error);
+                this.handleError('Error parsing classk:', error);
             }
         } else {
             console.log('No classk found');
@@ -73,7 +67,7 @@ export default {
                         router.push({ name: 'Class' });
                     })
                     .catch(error => {
-                        console.handleError(error);
+                        this.handleError(error);
                     });
             } else {
                 axios.post('http://localhost:3001/api/classes', this.form)
@@ -81,7 +75,7 @@ export default {
                         router.push({ name: 'Class' });
                     })
                     .catch(error => {
-                        console.handleError(error);
+                        this.handleError(error);
                     });
             }
         },

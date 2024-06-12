@@ -64,19 +64,17 @@ export default {
         gender: '',
         class: '',
         phone: '',
-        photo: null,
-        photoUrl: null,
+        photo: '',
+        photoUrl: '',
       },
       showPhotoModal: false,
       errorMessage: '',
     };
   },
   created() {
-    console.log('created() started');
     if (this.$route.params.student) {
       try {
         this.student = JSON.parse(this.$route.params.student);
-        console.log('Editing student:', this.student.photo);
         this.form.student_id = this.student.student_id || '';
         this.form.name = this.student.name || '';
         this.form.gender = this.student.gender || '';
@@ -114,10 +112,10 @@ export default {
       formData.append('gender', this.form.gender);
       formData.append('class', this.form.class);
       formData.append('phone', this.form.phone);
+      formData.append('photoUrl', this.form.photoUrl);  // 保留photoUrl字段
+
       if (this.form.photo) {
         formData.append('photo', this.form.photo);
-      } else if (this.form.photoUrl) {
-        formData.append('photoUrl', this.form.photoUrl);
       }
 
       const studentId = this.form.student_id;

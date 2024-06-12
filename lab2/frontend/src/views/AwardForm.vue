@@ -59,7 +59,7 @@ export default {
                 this.form.type = this.award.type || '';
                 this.form.description = this.award.description || '';
             } catch (error) {
-                console.handleError('Error parsing award:', error);
+                this.handleError('Error parsing award:', error);
             }
         } else {
             console.log('No award found');
@@ -79,7 +79,7 @@ export default {
                         router.push({ name: 'Award' });
                     })
                     .catch(error => {
-                        console.handleError(error);
+                        this.handleError(error);
                     });
             } else {
                 console.log('Adding award:', this.form)
@@ -89,7 +89,7 @@ export default {
                         router.push({ name: 'Award' });
                     })
                     .catch(error => {
-                        console.handleError(error);
+                        this.handleError(error);
                     });
             }
         },

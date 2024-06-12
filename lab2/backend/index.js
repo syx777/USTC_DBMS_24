@@ -75,7 +75,7 @@ app.get('/api/students', (req, res) => {
 });
 
 app.get('/api/students/search', (req, res) => {
-  const { student_id, name, gender, class: className, major,grade,status } = req.query;
+  const { student_id, name, gender, class: className,grade,status } = req.query;
   let sql = 'SELECT * FROM StudentView WHERE 1=1';
   const params = [];
 
@@ -96,10 +96,6 @@ app.get('/api/students/search', (req, res) => {
   if (className) {
     sql += ' AND class = ?';
     params.push(className);
-  }
-  if(major){
-    sql += ' AND major = ?';
-    params.push(major);
   }
   if(grade){
     sql += ' AND grade = ?';
@@ -145,15 +141,31 @@ app.post('/api/students', upload.single('photo'), (req, res) => {
 app.put('/api/students/:id', upload.single('photo'), (req, res) => {
   const updatedStudent = req.body;
   const photoPath = req.file ? req.file.path : null;
+  const studentId = req.params.id;
 
-  const sql = 'CALL AddOrUpdateStudent (?, ?, ?, ?, ?, ?, ?)';
-  db.query(sql, [req.params.id, updatedStudent.name, updatedStudent.gender, updatedStudent.class, updatedStudent.phone, photoPath, false], (err, result) => {
+  // 查询现有学生记录
+  const getStudentSql = 'SELECT photo FROM Students WHERE student_id = ?';
+  db.query(getStudentSql, [studentId], (err, results) => {
     if (err) {
-      console.error('Error updating student:', err);
+      console.error('Error fetching student:', err);
       res.status(500).json({ error: err.message });
       return;
     }
-    res.json(result);
+
+    // 如果没有上传新照片，保留现有照片路径
+    const currentPhotoPath = results.length > 0 ? results[0].photo : null;
+    const finalPhotoPath = photoPath || currentPhotoPath;
+
+    // 更新学生记录
+    const sql = 'CALL AddOrUpdateStudent (?, ?, ?, ?, ?, ?, ?)';
+    db.query(sql, [studentId, updatedStudent.name, updatedStudent.gender, updatedStudent.class, updatedStudent.phone, finalPhotoPath, false], (err, result) => {
+      if (err) {
+        console.error('Error updating student:', err);
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(result);
+    });
   });
 });
 
@@ -186,8 +198,8 @@ app.get('/api/classes', (req, res) => {
 //添加班级
 app.post('/api/classes', (req, res) => {
   const newClass = req.body;
-  const sql = 'INSERT INTO Class (class_id, major,grade) VALUES (?, ?,?)';
-  db.query(sql, [newClass.class_id, newClass.major, newClass.grade], (err, result) => {
+  const sql = 'INSERT INTO Class (class_id, grade) VALUES (?, ?)';
+  db.query(sql, [newClass.class_id, newClass.grade], (err, result) => {
     if (err) {
       console.error('Error inserting class:', err);
       res.status(500).json({ error: err.message });
@@ -200,8 +212,8 @@ app.post('/api/classes', (req, res) => {
 //更新班级信息
 app.put('/api/classes/:id', (req, res) => {
   const updatedClass = req.body;
-  const sql = 'UPDATE Class SET major = ?, grade = ? WHERE class_id = ?';
-  db.query(sql, [updatedClass.major, updatedClass.grade, req.params.id], (err, result) => {
+  const sql = 'UPDATE Class SET grade = ? WHERE class_id = ?';
+  db.query(sql, [updatedClass.grade, req.params.id], (err, result) => {
     if (err) {
       console.error('Error updating class:', err);
       res.status(500).json({ error: err.message });
@@ -210,23 +222,32 @@ app.put('/api/classes/:id', (req, res) => {
     res.json(result);
   });
 });
+
+//删除班级
+app.delete('/api/classes/:id', (req, res) => {
+  const sql = 'DELETE FROM Class WHERE class_id = ?';
+  db.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      console.error('Error deleting class:', err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(result);
+  });
+});
+
 // 启动服务器并提供静态文件服务
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 app.get('/api/classes/search', (req, res) => {
-  const { class_id, major, grade } = req.query;
+  const { class_id, grade } = req.query;
   let sql = 'SELECT * FROM Class WHERE 1=1';
   const params = [];
 
   if (class_id) {
     sql += ' AND class_id = ?';
     params.push(class_id);
-  }
-
-  if (major) {
-    sql += ' AND major LIKE ?';
-    params.push(`%${major}%`);
   }
   if (grade) {
     sql += ' AND grade = ?';

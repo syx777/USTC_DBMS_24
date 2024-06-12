@@ -59,7 +59,7 @@ export default {
                 this.form.course_place = this.course.course_place || '';
                 this.form.credits = this.course.credits || '';
             } catch (error) {
-                console.handleError(error);
+                this.handleError(error);
             }
         } else {
             console.log('No course found');
@@ -79,7 +79,7 @@ export default {
                         router.push({ name: 'Course' });
                     })
                     .catch(error => {
-                        console.handleError(error);
+                        this.handleError(error);
                     });
             } else {
                 axios.post('http://localhost:3001/api/courses', this.form)
@@ -87,7 +87,7 @@ export default {
                         router.push({ name: 'Course' });
                     })
                     .catch(error => {
-                        console.handleError(error);
+                        this.handleError(error);
                     });
             }
         },

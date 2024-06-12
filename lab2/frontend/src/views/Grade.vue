@@ -82,7 +82,7 @@ export default {
                     this.grades = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         searchGrades() {
@@ -91,7 +91,7 @@ export default {
                     this.grades = response.data;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         editGrade(grade) {
@@ -105,7 +105,7 @@ export default {
                     this.isEditing = false;
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         clearGrade(student_id, course_id) {
@@ -114,7 +114,7 @@ export default {
                     this.fetchGrades();
                 })
                 .catch(error => {
-                    console.handleError(error);
+                    this.handleError(error);
                 });
         },
         cancelEdit() {
