@@ -22,18 +22,6 @@ CREATE TABLE Students (
 );
 
 
-//存储过程：添加学生
-
-
-
-CREATE PROCEDURE AddStudent(
-    IN student_id VARCHAR(10),
-    IN name VARCHAR(100),
-    IN gender ENUM('M', 'F'),
-    IN class VARCHAR(20),
-    IN phone VARCHAR(20),
-    IN photo LONGBLOB
-)
 BEGIN
     INSERT INTO Students (student_id,name, gender, class,phone,photo)
     VALUES (student_id,name, gender, class,phone,photo);
@@ -53,7 +41,7 @@ BEGIN
     SELECT COUNT(*) INTO class_size FROM Students WHERE class = class_id;
     RETURN class_size;
 END; */
-/*创建班级信息视图，包含班级编号、专业、班级人数*/
+/*创建班级信息视图，包含班级编号、毕业时间、班级人数*/
 /* CREATE VIEW ClassInfo AS
 SELECT class_id, graduate, GetClassSize(class_id) AS class_size FROM Class; */
 
@@ -75,7 +63,6 @@ BEGIN
     -- 开始事务
     START TRANSACTION;
 
-    -- 如果是新学生
     IF p_is_new THEN
         INSERT INTO Students (student_id, name, gender, class, phone, photo)
         VALUES (p_student_id, p_name, p_gender, p_class, p_phone, p_photo);
@@ -98,6 +85,11 @@ BEGIN
     END IF;
 END$$
 
+/* CREATE VIEW StudentView AS
+SELECT Students.*, Class.graduate
+FROM Students
+JOIN Class ON Students.class = Class.class_id; */
+
 -- 课程管理表
 /*CREATE TABLE Courses (
     course_id VARCHAR(20) PRIMARY KEY,
@@ -105,6 +97,7 @@ END$$
     course_place VARCHAR(20),
     credits INT
 );*/
+
 -- 选课表
 /*CREATE TABLE CourseSelection (
     student_id VARCHAR(20),
@@ -161,14 +154,12 @@ FOR EACH ROW
 BEGIN
     DECLARE all_passed BOOLEAN;
 
-    -- 检查该学生的所有课程成绩
     SELECT COUNT(*) = 0
     INTO all_passed
     FROM CourseSelection
     WHERE student_id = NEW.student_id
     AND (grade < 60);
 
-    -- 更新学生的状态
     IF all_passed THEN
         UPDATE Students
         SET status = '合格'
@@ -187,14 +178,13 @@ FOR EACH ROW
 BEGIN
     DECLARE all_passed BOOLEAN;
 
-    -- 检查该学生的所有课程成绩
     SELECT COUNT(*) = 0
     INTO all_passed
     FROM CourseSelection
     WHERE student_id = OLD.student_id
     AND (grade < 60);
 
-    -- 更新学生的状态
+
     IF all_passed THEN
         UPDATE Students
         SET status = '合格'
@@ -206,7 +196,6 @@ BEGIN
     END IF;
 END //
 
-DELIMITER ; */
 
 -- 奖惩情况表
 /* CREATE TABLE AwardsPunishments (
@@ -231,18 +220,9 @@ FROM
 
 -- DELIMITER ; 
 
-/* ALTER TABLE Students
-ADD FOREIGN KEY (class) REFERENCES Class(class_id);  */
 
 
-/* CREATE VIEW StudentView AS
-SELECT Students.*, Class.graduate
-FROM Students
-JOIN Class ON Students.class = Class.class_id; */
 
-
-/* ALTER TABLE Students
-ALTER COLUMN status SET DEFAULT '合格'; */
 
 
 

@@ -59,7 +59,7 @@ export default {
       if (this.loginPrompt) {
         setTimeout(() => {
           this.$store.commit('clearLoginPrompt');
-        }, 3000);
+        }, 3001);
       }
     }
   }
